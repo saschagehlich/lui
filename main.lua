@@ -1,14 +1,27 @@
 local lui = require("lui")
 
-local gui = lui()
+local gui = nil
 
-local window = gui:createWindow("This is the title")
-window:show()
+function love.load()
+  print("Ohai!")
 
-function love:update(dt)
+  gui = lui()
+
+  local window = gui:createWindow("Window title")
+  window:setPosition(100, 100)
+  window:show()
+end
+
+function love.update(dt)
   gui:update(dt)
 end
 
-function love:draw()
+function love.draw()
   gui:draw()
+end
+
+function love.keypressed(key)
+  if key == "escape" then
+    love.event.quit()
+  end
 end

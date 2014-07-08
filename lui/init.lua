@@ -1,19 +1,23 @@
 local path = ...
-local class = require(path .. "/lib.middleclass")
+local class = require(path .. ".lib.middleclass")
+local DefaultSkin = require(path .. ".skins.Default")
 
 local lui = class("lui")
 
 lui.availableObjects = {
-  "Window"
+  "Object", "Window"
 }
 
 --- The main entry point / constructor
 --  @param {Table} config
 function lui:initialize(config)
   self.config = config
+  self.skin = DefaultSkin(self)
   self.objects = {}
 
   self:buildCreators()
+
+  self.root = self:createObject()
 end
 
 --- Builds `lui:create{ObjectName}` methods for all available object types
@@ -25,7 +29,7 @@ function lui:buildCreators()
 
     -- Create generator method
     self["create" .. objectName] = function(...)
-      local newObject = class(self, ...)
+      local newObject = class(...)
       self:_addObject(newObject)
       return newObject
     end
@@ -39,27 +43,18 @@ function lui:_addObject(object)
   self.objects[#self.objects + 1] = object
 end
 
---- Calls `fn` for each existing object
---  @param {Function} fn
-function lui:eachObject(fn)
-  for _, object in ipairs(self.objects) do
-    fn(object)
-  end
-end
-
---- Updates all objects
+--- Updates the root object
 --  @param {Number} dt
 function lui:update(dt)
-  self:eachObject(function (object)
-    object:update(dt)
-  end)
+  self.root:update(dt)
 end
 
---- Draws all objects
+--- Draws the root object
 function lui:draw()
-  self:eachObject(function (object)
-    object:draw()
-  end)
+  -- Generic styles
+  love.graphics.setLineStyle("rough")
+
+  self.root:draw()
 end
 
 return lui

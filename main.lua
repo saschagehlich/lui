@@ -9,6 +9,9 @@ function love.load()
 
   local window = gui:createWindow("Window title")
   window:setPosition(100, 100)
+  window:on("hover", function (object)
+    print("Hovering", object)
+  end)
   window:show()
 end
 

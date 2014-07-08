@@ -12,6 +12,9 @@ function love.load()
   window:on("hover", function (object)
     print("Hovering", object)
   end)
+  window:on("blur", function (object)
+    print("Not hovering anymore", object)
+  end)
   window:show()
 end
 

@@ -22,21 +22,19 @@ function EventEmitter:emit(eventName, ...)
 end
 
 --- Adds a new listener for the given event name
---  @param {String} eventName
---  @param {Table} context
+--  @param {String} eventNames
 --  @param {Function} listener
-function EventEmitter:on(eventName, context, listener)
-  if type(context) == "function" then
-    listener = context
-    context = nil
-  end
+--  @param {Table} context
+function EventEmitter:on(eventNames, listener, context)
   assert(type(listener) == "function", "EventEmitter:on: Listener is not a function.")
 
-  self._events[eventName] = self._events[eventName] or {}
-  table.insert(self._events[eventName], {
-    fn = listener,
-    context = context
-  })
+  for eventName in eventNames:gmatch("%w+") do
+    self._events[eventName] = self._events[eventName] or {}
+    table.insert(self._events[eventName], {
+      fn = listener,
+      context = context
+    })
+  end
 end
 
 --- Removes an event listener

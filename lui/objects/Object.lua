@@ -30,7 +30,7 @@ function Object:update(dt)
   self:_handleMouse(dt)
 
   -- Update children
-  self:_eachChild(function (object)
+  self:eachChild(function (object)
     object:update(dt)
   end)
 end
@@ -38,27 +38,21 @@ end
 --- Draws the object
 function Object:draw()
   -- Draw children
-  self:_eachChild(function (object)
+  self:eachChild(function (object)
     object:draw()
   end)
 end
 
---- Calls fn for each child
---  @param {Function} fn
-function Object:_eachChild(fn)
-  for _, child in pairs(self.children) do
-    fn(child)
-  end
-end
-
 --- Gets the drawing position (considering positionMode, offset etc.)
 --  @returns {Number, Number}
+--  @private
 function Object:_getRealPosition()
   return self.position.x, self.position.y
 end
 
 --- Handles mouse interaction
 --  @param {Number} dt
+--  @private
 function Object:_handleMouse(dt)
   local x, y = self:_getRealPosition()
   local width, height = self.size.width, self.size.height
@@ -90,6 +84,19 @@ end
 --[[
   Public methods
 ]]--
+
+--- Calls fn for each child
+--  @param {Function} fn
+--  @param {Boolean} recursive
+--  @private
+function Object:eachChild(fn, recursive)
+  for _, child in pairs(self.children) do
+    fn(child)
+    if recursive then
+      child:eachChild(fn, true)
+    end
+  end
+end
 
 --- Adds a child to this object
 --  @param {Object} object

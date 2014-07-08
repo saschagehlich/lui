@@ -15,21 +15,26 @@ function lui:initialize(config)
   self.skin = DefaultSkin(self)
   self.objects = {}
 
-  self:buildCreators()
+  -- States
+  self.hovered = false
+
+  self:_buildCreators()
 
   self.root = self:createObject()
 end
 
 --- Builds `lui:create{ObjectName}` methods for all available object types
-function lui:buildCreators()
+--  @private
+function lui:_buildCreators()
   for _, objectName in ipairs(self.availableObjects) do
     -- Get class
     local class = require(path .. ".objects." .. objectName)
     assert(class, "Object type " .. objectName .. " could not be found.")
 
-    -- Create generator method
+    -- Creates a new instance of `objectName`
     self["create" .. objectName] = function(...)
       local newObject = class(...)
+      self:_onNewObject(newObject)
       self:_addObject(newObject)
       return newObject
     end
@@ -41,6 +46,27 @@ end
 --  @private
 function lui:_addObject(object)
   self.objects[#self.objects + 1] = object
+end
+
+--- Gets called when a new object is instantiated, listens for
+--  events to update global states
+--  @param {Object} object
+--  @private
+function lui:_onNewObject(object)
+  object:on("hover blur", self._updateHoverState, self)
+end
+
+--- Iterates over all objects, checks for hovered state
+--  @private
+function lui:_updateHoverState()
+  self.hovered = false
+
+  self.root:eachChild(function (object)
+    if self.hovered then return end
+    if object.hovered then
+      self.hovered = object.hovered
+    end
+  end, true)
 end
 
 --- Updates the root object

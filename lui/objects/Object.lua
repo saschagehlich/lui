@@ -82,6 +82,11 @@ function Object:draw()
   self:eachChild(function (object)
     object:draw()
   end)
+
+  -- Draw internals
+  self:eachInternal(function (object)
+    object:draw()
+  end)
 end
 
 --- If the given value is a string containing %, this
@@ -362,7 +367,7 @@ function Object:getX(relative)
     x = centerX - width / 2
   end
 
-  return x
+  return Util.round(x)
 end
 
 --- Gets the Y position of this object
@@ -394,7 +399,7 @@ function Object:getY(relative)
     end
   end
 
-  return y
+  return Util.round(y)
 end
 
 --- Gets the position by the currently set `center` object / position

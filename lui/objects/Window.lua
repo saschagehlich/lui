@@ -19,7 +19,7 @@ function Window:initialize(lui, title)
     x = 0,
     y = 0,
     width = "100%",
-    height = 12
+    height = self.lui.skin.windowTitleBarHeight
   }
 
   self.isDraggable = true

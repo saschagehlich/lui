@@ -15,7 +15,7 @@ DefaultSkin.shadowColor = { 0, 0, 0, 50 }
 
 -- Spacings
 DefaultSkin.windowPadding = { x = 5, y = 30 }
-DefaultSkin.windowTitleBarHitboxHeight = 15
+DefaultSkin.windowTitleBarHeight = 15
 
 --- Constructor
 --  @param {lui} lui
@@ -84,11 +84,24 @@ function DefaultSkin:drawWindowTitleBarBackground(window, x, y)
   love.graphics.setColor(self.titleBarBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)
 
+  self:drawLighting(true, x, y, width, height)
+
+  -- Reset color
+  love.graphics.setColor(255, 255, 255)
+end
+
+--- Draws the lighting
+--  @param {Boolean} inset
+--  @param {Number} x
+--  @param {Number} y
+--  @param {Number} width
+--  @param {Number} height
+function DefaultSkin:drawLighting(inset, x, y, width, height)
   -- Draw shadow
   local points = {
-    x, y + height + 1,
-    x, y - 1,
-    x + width + 1, y - 1
+    x, y + height,
+    x, y,
+    x + width + 1, y
   }
   love.graphics.setColor(self.shadowColor)
   love.graphics.setLineStyle("rough")

@@ -100,6 +100,9 @@ end
 --- Handles hover states
 --  @private
 function Object:_handleHover()
+  -- Don't change hovered state when dragging
+  if self.dragging then return end
+
   local x, y = self:_getRealPosition()
   local width = self:_evaluateNumber(self.size.width, "x")
   local height = self:_evaluateNumber(self.size.height, "y")

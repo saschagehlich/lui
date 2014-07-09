@@ -60,4 +60,11 @@ function Text:setAlignment(x, y)
   self.alignment.y = y
 end
 
+--- Sets the text
+--  @param {String} text
+--  @public
+function Text:setText(text)
+  self.text = text
+end
+
 return Text

@@ -12,11 +12,8 @@ function love.load()
   window:setSize("80%", "80%")
   window:show()
 
-  local button = gui:createButton("Button caption")
-  button:setPosition({
-    bottom = 0,
-    left = 0
-  })
+  local button = gui:createButton("OK")
+  button:setPosition({ bottom = 0, right = 0 })
   window:addChild(button)
 end
 

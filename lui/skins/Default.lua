@@ -9,6 +9,7 @@ local DefaultSkin = class("DefaultSkin")
 -- Colors
 DefaultSkin.windowBackgroundColor = { 112, 131, 125 }
 DefaultSkin.buttonBackgroundColor = { 112, 131, 125 }
+DefaultSkin.buttonPressedBackgroundColor = { 159, 175, 175 }
 DefaultSkin.titleBarBackgroundColor = { 47, 67, 67 }
 
 DefaultSkin.lightColor = { 255, 255, 255, 50 }
@@ -48,10 +49,17 @@ function DefaultSkin:drawButton(button)
   local x, y = button:getPosition()
   local width, height = button:getInnerSize()
 
-  love.graphics.setColor(self.buttonBackgroundColor)
+  local color = self.buttonBackgroundColor
+  local lightingInset = false
+  if button.isPressed then
+    color = self.buttonPressedBackgroundColor
+    lightingInset = true
+  end
+
+  love.graphics.setColor(color)
   love.graphics.rectangle("fill", x, y, width, height)
 
-  self:drawLighting(false, x, y, width, height)
+  self:drawLighting(lightingInset, x, y, width, height)
 end
 
 --- Draws the window background

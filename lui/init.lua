@@ -18,7 +18,7 @@ function lui:initialize(config)
   self.objects = {}
 
   -- States
-  self.hovered = false
+  self.isHovered = false
 
   self:_buildCreators()
 
@@ -61,12 +61,12 @@ end
 --- Iterates over all objects, checks for hovered state
 --  @private
 function lui:_updateHoverState()
-  self.hovered = false
+  self.isHovered = false
 
   self.root:eachChild(function (object)
-    if self.hovered then return end
-    if object.hovered then
-      self.hovered = object.hovered
+    if self.isHovered then return end
+    if object.isHovered then
+      self.isHovered = object.isHovered
     end
   end, true)
 end

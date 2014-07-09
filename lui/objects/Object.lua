@@ -22,9 +22,10 @@ function Object:initialize(lui)
   -- States
   self.isVisible = true
   self.isDraggable = false
+  self.isPressed = false
 
   self.isDragging = false
-  self.isHovering = false
+  self.isHovered = false
 
   self.size = { width = 0, height = 0 }
   self.position = { top = 0, left = 0 }
@@ -133,6 +134,7 @@ end
 --  @private
 function Object:_handleMouse(dt)
   self:_handleHover()
+  self:_handleClick()
 
   if self.isDraggable then
     self:_handleDragging()
@@ -156,15 +158,33 @@ function Object:_handleHover()
     mouseY < y or
     mouseY > y + height) then
       -- Update hovered state, emit `hover` event
-      if not self.hovered then
+      if not self.isHovered then
         self:emit("hover", self)
-        self.hovered = true
+        self.isHovered = true
       end
   else
     -- Update hovered state, emit `blur` event
-    if self.hovered then
-      self.hovered = false
+    if self.isHovered then
+      self.isHovered = false
       self:emit("blur", self)
+    end
+  end
+end
+
+--- Handles object clicking
+--  @private
+function Object:_handleClick()
+  local mouseDown = love.mouse.isDown("l")
+  if self.isHovered and mouseDown and not self.isPressed then
+    self:emit("mousepressed")
+    self.isPressed = true
+  else
+    if not mouseDown and self.isPressed then
+      self:emit("mousereleased")
+      self.isPressed = false
+      if self.isHovered then
+        self:emit("click")
+      end
     end
   end
 end
@@ -193,7 +213,7 @@ function Object:_handleDragging()
 
   -- If we're dragging, we're also hovering
   if self.isDragging then
-    self.isHovering = true
+    self.isHovered = true
   end
 end
 

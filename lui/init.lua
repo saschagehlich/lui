@@ -5,8 +5,9 @@ local DefaultSkin = require(path .. ".skins.Default")
 local lui = class("lui")
 
 lui.availableObjects = {
-  "Object", "Root", "Window",
+  "Object", "Root",
 
+  "Window", "Panel",
   "Button", "Text", "Image"
 }
 

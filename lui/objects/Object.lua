@@ -95,24 +95,139 @@ function Object:_evaluateNumber(value, coordinate, ownSize)
   end
 
   if type(value) == "string" then
-    local baseWidth, baseHeight = baseObject:getInnerSize()
-
-    assert(string.find(value, "%%"), "Value " .. value .. " is a string, but does not contain `%`.")
-
-    -- Remove %
-    value = string.gsub(value, "%%", "")
+    local ignorePadding = self.positionMode == "absolute"
+    local baseWidth, baseHeight = baseObject:getInnerSize(ignorePadding)
 
     -- Get parent size
+    local baseValue
     if coordinate == "x" then
-      local width = baseWidth
-      return Util.round(width / 100 * value)
+      baseValue = baseWidth
     elseif coordinate == "y" then
-      local height = baseHeight
-      return Util.round(height / 100 * value)
+      baseValue = baseHeight
+    end
+
+    if string.find(value, "%%") then
+      -- Percentage
+      value = string.gsub(value, "%%", "") -- remove %
+      return Util.round(baseValue / 100 * value)
+    elseif value == "max" then
+      -- Max size
+      local maxValue
+      if coordinate == "x" then
+        maxValue = self:_getMaxWidth()
+      elseif coordinate == "y" then
+        maxValue = self:_getMaxHeight()
+      end
+
+      return maxValue
     end
   else
     return value
   end
+end
+
+--- Finds the maximum width of this object, based on its parent's size
+--  and the other objects in its parent
+--  @returns {Number}
+function Object:_getMaxWidth()
+  local positionValues = self.position
+  local parentWidth, parentHeight = self.parent:getSize()
+
+  local maxWidth
+  if positionValues.left then
+    local x, y = self:getRelativePosition()
+
+    -- Default: Parent's right border
+    maxWidth = parentWidth - x
+
+    -- Iterate over all parent's objects, check for their x position
+    self.parent:eachChild(function (object)
+      if object == self then return end
+
+      local objectX, objectY = object:getRelativePosition()
+      local objectWidth, objectHeight = object:getSize()
+
+      -- Early return if the object is on the left of this one
+      if objectX + objectWidth < x or objectX < x then return end
+
+      local widthUntilObject = objectX - x
+
+      maxWidth = math.min(maxWidth, widthUntilObject)
+    end)
+  elseif positionValues.right then
+    -- Default: Parent's left border
+    local right = self:_evaluateNumber(positionValues.right, "x")
+    maxWidth = parentWidth - right
+
+    -- Iterate over all parent's objects, check for their x position
+    self.parent:eachChild(function (object)
+      if object == self then return end
+
+      local objectX, objectY = object:getRelativePosition()
+      local objectWidth, objectHeight = object:getSize()
+
+      -- Early return if the object is on the left of this one
+      if objectX > right then return end
+
+      local widthUntilObject = parentWidth - (objectX + objectWidth) - right
+
+      maxWidth = math.min(maxWidth, widthUntilObject)
+    end)
+  end
+
+  return maxWidth
+end
+
+--- Finds the maximum height of this object, based on its parent's size
+--  and the other objects in its parent
+--  @returns {Number}
+function Object:_getMaxHeight()
+  local positionValues = self.position
+  local parentWidth, parentHeight = self.parent:getSize()
+  local maxHeight
+
+  if positionValues.top then
+    local x, y = self:getRelativePosition()
+
+    -- Default: Parent's right border
+    maxHeight = parentWidth - x
+
+    -- Iterate over all parent's objects, check for their x position
+    self.parent:eachChild(function (object)
+      if object == self then return end
+
+      local objectX, objectY = object:getRelativePosition()
+      local width, height = object:getSize()
+
+      -- Early return if the object is on the left of this one
+      if objectY + height < y or objectY < y then return end
+
+      local heightUntilObject = objectY - y
+
+      maxHeight = math.min(maxHeight, heightUntilObject)
+    end)
+  elseif positionValues.bottom then
+    -- Default: Parent's left border
+    local bottom = self:_evaluateNumber(positionValues.bottom, "y")
+    maxHeight = parentHeight - bottom
+
+    -- Iterate over all parent's objects, check for their x position
+    self.parent:eachChild(function (object)
+      if object == self then return end
+
+      local objectX, objectY = object:getRelativePosition()
+      local objectWidth, objectHeight = object:getSize()
+
+      -- Early return if the object is on the left of this one
+      if objectY > bottom then return end
+
+      local heightUntilObject = parentHeight - (objectY + objectHeight) - bottom
+
+      maxHeight = math.min(maxHeight, heightUntilObject)
+    end)
+  end
+
+  return maxHeight
 end
 
 --- Returns the x or y position for the given positions table
@@ -334,6 +449,16 @@ function Object:getPosition()
   end
 
   return x, y
+end
+
+--- Gets the relative position
+--  @returns {Number, Number}
+--  @public
+function Object:getRelativePosition()
+  local x, y = self:getPosition()
+  local parentX, parentY = self.parent:getPosition()
+
+  return x - parentX, y - parentY
 end
 
 --- Gets the position by the currently set `center` object / position

@@ -14,6 +14,7 @@ function Object:initialize(lui)
 
   self.parent = nil
   self.center = nil
+  self.centerFlags = { x = false, y = false }
   self.children = {}
 
   -- `absolute` = ignore padding
@@ -276,10 +277,6 @@ end
 --  @returns {Number, Number}
 --  @public
 function Object:getPosition()
-  if self.center then
-    return self:getPositionByCenter()
-  end
-
   local x = self:_evaluatePosition(self.position, "x")
   local y = self:_evaluatePosition(self.position, "y")
 
@@ -297,6 +294,20 @@ function Object:getPosition()
     end
   end
 
+  -- If centering is enabled for x or y, set the position to
+  -- the center
+  if self.center then
+    local centerX, centerY = self:getPositionByCenter()
+    local width, height = self:getSize()
+    if self.centerFlags.x then
+      x = centerX - width / 2
+    end
+
+    if self.centerFlags.y then
+      y = centerY - height / 2
+    end
+  end
+
   return x, y
 end
 
@@ -306,15 +317,16 @@ end
 function Object:getPositionByCenter()
   local center = self.center
   local width, height = self:getSize()
-  local x, y
 
+  -- Find current center positions
+  local centerX, centerY
   if center.class then
-    x, y = center:getCenterPosition()
+    centerX, centerY = center:getCenterPosition()
   else
-    x, y = self.center.x, self.center.y
+    centerX, centerY = self.center.x, self.center.y
   end
 
-  return Util.round(x - width / 2), Util.round(y - height / 2)
+  return centerX, centerY
 end
 
 --- Returns the center position of this object
@@ -403,18 +415,32 @@ end
 --- Centers this object inside the given object
 --  @param {Object|Number} x
 --  @param {Number} y
+--  @param {Boolean} centerX
+--  @param {Boolean} centerY
 --  @public
-function Object:setCenter(x, y)
-  local position
-  if not x then
-    -- Not passing anything, use parent for center position
-    self.center = self.parent
-  elseif not x.class then
-    -- Passing an object, use it for center position
-    self.center = x
-  elseif type(x) ~= "table" then
-    -- Passing a fixed center position (two parameters)
+function Object:setCenter(x, y, centerX, centerY)
+  -- setCenter(x, y)
+  if type(x) == "number" then
     self.center = { x = x, y = y }
+    return
+  end
+
+  -- setCenter(Object)
+  if type(x) == "table" then
+    self.center = x
+    return
+  end
+
+  -- setCenter() / setCenter(bool, bool)
+  if type(x) == "boolean" or x == nil then
+    local centerX = x
+    if centerX == nil then centerX = true end
+    local centerY = y
+    if centerY == nil then centerY = true end
+
+    self.center = self.parent
+    self.centerFlags = { x = centerX, y = centerY }
+    return
   end
 end
 

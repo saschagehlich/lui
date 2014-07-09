@@ -9,7 +9,8 @@ function love.load()
 
   local window = gui:createWindow("Window title")
   window:setSize(300, 250)
-  window:setCenter()
+  window:setPosition(0, "10%")
+  window:setCenter(true, false)
   window:setShowCloseButton(true)
   window:show()
 
@@ -17,6 +18,8 @@ function love.load()
   button:setPosition({ bottom = 0, right = 0 })
   button:setToggleable(true)
   window:addChild(button)
+
+  button:setCenter(true, false)
 end
 
 function love.update(dt)

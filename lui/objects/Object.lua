@@ -17,6 +17,7 @@ function Object:initialize(lui)
   self.lockedToObject = nil
   self.centerFlags = { x = false, y = false }
   self.children = {}
+  self.internals = {}
 
   -- `absolute` = ignore padding
   -- `relative` = add padding to position
@@ -53,6 +54,11 @@ function Object:update(dt)
 
   -- Update children
   self:eachChild(function (object)
+    object:update(dt)
+  end)
+
+  -- Update internals
+  self:eachInternal(function (object)
     object:update(dt)
   end)
 end
@@ -550,11 +556,32 @@ function Object:eachChild(fn, recursive)
   end
 end
 
+--- Calls fn for each internal
+--  @param {Function} fn
+--  @param {Boolean} recursive
+--  @public
+function Object:eachInternal(fn, recursive)
+  for _, child in pairs(self.internals) do
+    fn(child)
+    if recursive then
+      child:eachInternal(fn, true)
+    end
+  end
+end
+
 --- Adds a child to this object
 --  @param {Object} object
 --  @public
 function Object:addChild(object)
   self.children[#self.children + 1] = object
+  object:setParent(self)
+end
+
+--- Adds an internal to this object
+--  @param {Object} object
+--  @public
+function Object:addInternal(object)
+  self.internals[#self.internals + 1] = object
   object:setParent(self)
 end
 

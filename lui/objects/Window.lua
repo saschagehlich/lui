@@ -43,7 +43,7 @@ function Window:_createCloseButton()
   self.closeButton:setPositionMode("absolute")
   self.closeButton:setPosition({ right = 2, top = 2 })
   self.closeButton:on("click", self._onCloseClick, self)
-  self:addChild(self.closeButton)
+  self:addInternal(self.closeButton)
 
   local basePathSlashes = basePath:gsub("%.", "/")
   self.closeImage = self.lui:createImage(basePathSlashes .. "/objects/window/close.png")

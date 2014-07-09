@@ -8,7 +8,8 @@ local DefaultSkin = class("DefaultSkin")
 
 -- Colors
 DefaultSkin.windowBackgroundColor = { 112, 131, 125 }
-DefaultSkin.panelBackgroundColor = { 255, 0, 0, 128 }
+DefaultSkin.panelBackgroundColor = { 159, 183, 111 }
+-- DefaultSkin.panelBackgroundColor = { 255, 0, 0, 128 }
 DefaultSkin.buttonBackgroundColor = { 112, 131, 125 }
 DefaultSkin.buttonPressedBackgroundColor = { 159, 175, 175 }
 DefaultSkin.titleBarBackgroundColor = { 47, 67, 67 }

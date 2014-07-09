@@ -139,6 +139,9 @@ function Object:_getMaxWidth()
   local positionValues = self.position
   local parentWidth, parentHeight = self.parent:getInnerSize()
 
+  local y = self:getY()
+  local height = self:getHeight()
+
   local maxWidth
   if positionValues.left then
     local x = self:_evaluateNumber(positionValues.left, "x")
@@ -151,6 +154,13 @@ function Object:_getMaxWidth()
       if object == self then return end
 
       local objectX, objectY = object:getRelativePosition()
+      local objectHeight = object:getHeight()
+
+      -- If they don't intersect on the Y axis, gtfo.
+      if objectY + objectHeight < y or objectY > y + height then
+        return
+      end
+
       if objectX <= x then return end
       local objectWidth = object:getWidth()
       if objectX + objectWidth <= x then return end
@@ -169,7 +179,14 @@ function Object:_getMaxWidth()
       if object == self then return end
 
       local objectX, objectY = object:getRelativePosition()
-      if objectX >= right then return end
+      local objectHeight = object:getHeight()
+
+      -- If they don't intersect on the Y axis, gtfo.
+      if objectY + objectHeight < y or objectY > y + height then
+        return
+      end
+
+      if objectX >= parentWidth - right then return end
       local objectWidth = object:getWidth()
 
       local widthUntilObject = parentWidth - (objectX + objectWidth) - right
@@ -189,6 +206,11 @@ function Object:_getMaxHeight()
   local parentWidth, parentHeight = self.parent:getInnerSize()
   local maxHeight
 
+  local x = 0
+  local width = 0
+  local x = self:getX()
+  local width = self:getWidth()
+
   if positionValues.top then
     local y = self:_evaluateNumber(positionValues.top, "y")
 
@@ -200,13 +222,20 @@ function Object:_getMaxHeight()
       if object == self then return end
 
       local objectX, objectY = object:getRelativePosition()
+      local objectWidth = object:getWidth()
+
+      -- If they don't intersect on the X axis, gtfo.
+      if objectX + objectWidth < x or objectX > x + width then
+        return
+      end
+
       if objectY <= y then return end
       local height = object:getHeight()
       if objectY + height <= y then return end
 
       local heightUntilObject = objectY - y
 
-      maxHeight = math.max(maxHeight, heightUntilObject)
+      maxHeight = math.min(maxHeight, heightUntilObject)
     end)
   elseif positionValues.bottom then
     -- Default: Parent's left border
@@ -218,6 +247,13 @@ function Object:_getMaxHeight()
       if object == self then return end
 
       local objectX, objectY = object:getRelativePosition()
+      local objectWidth = object:getWidth()
+
+      -- If they don't intersect on the X axis, gtfo.
+      if objectX + objectWidth < x or objectX > x + width then
+        return
+      end
+
       if objectY >= bottom then return end
       local objectHeight = object:getWidth()
 
@@ -241,8 +277,8 @@ function Object:_evaluatePosition(position, coordinate)
     if position.left then
       return self:_evaluateNumber(position.left, "x")
     elseif position.right then
-      local parentWidth, parentHeight = self.parent:getInnerSize(ignorePadding)
-      local width, height = self:getInnerSize()
+      local parentWidth = self.parent:getInnerWidth(ignorePadding)
+      local width = self:getInnerWidth()
       local right = self:_evaluateNumber(position.right, "x")
 
       return parentWidth - width - right
@@ -417,19 +453,52 @@ end
 --  @returns {Number, Number}
 --  @public
 function Object:getPosition()
+  return self:getX(), self:getY()
+end
+
+--- Gets the X position of this object
+--  @returns {Number}
+--  @public
+function Object:getX()
   local x = self:_evaluatePosition(self.position, "x")
-  local y = self:_evaluatePosition(self.position, "y")
 
   if self.parent then
     -- Add parent offset
     local parentX, parentY = self.parent:getPosition()
     x = x + parentX
-    y = y + parentY
 
     -- Add parent padding
     if self.positionMode == "relative" then
       local top, right, bottom, left = self.parent:getPadding()
       x = x + left
+    end
+  end
+
+  -- If centering is enabled for x or y, set the position to
+  -- the center
+  if self.center and self.centerFlags.x then
+    local centerX, centerY = self:getPositionByCenter()
+    local width = self:getWidth()
+    x = centerX - width / 2
+  end
+
+  return x
+end
+
+--- Gets the Y position of this object
+--  @returns {Number}
+--  @public
+function Object:getY()
+  local y = self:_evaluatePosition(self.position, "y")
+
+  if self.parent then
+    -- Add parent offset
+    local parentX, parentY = self.parent:getPosition()
+    y = y + parentY
+
+    -- Add parent padding
+    if self.positionMode == "relative" then
+      local top, right, bottom, left = self.parent:getPadding()
       y = y + top
     end
   end
@@ -438,17 +507,13 @@ function Object:getPosition()
   -- the center
   if self.center then
     local centerX, centerY = self:getPositionByCenter()
-    local width, height = self:getSize()
-    if self.centerFlags.x then
-      x = centerX - width / 2
-    end
-
+    local height = self:getHeight()
     if self.centerFlags.y then
       y = centerY - height / 2
     end
   end
 
-  return x, y
+  return y
 end
 
 --- Gets the relative position
@@ -517,18 +582,38 @@ end
 --  @returns {Number, Number}
 --  @public
 function Object:getInnerSize(ignorePadding)
-  local width, height = self:getSize()
-  local paddingX, paddingY
+  return self:getInnerWidth(ignorePadding), self:getInnerHeight(ignorePadding)
+end
+
+
+--- Gets the inner width
+--  @param {Boolean} ignorePadding
+--  @returns {Number}
+--  @public
+function Object:getInnerWidth(ignorePadding)
+  local width = self:getWidth()
+  local paddingX = 0
   if self.positionMode == "relative" and not ignorePadding then
     local top, right, bottom, left = self:getPadding()
-
     paddingX = left + right
-    paddingY = top + bottom
-  else
-    paddingX, paddingY = 0, 0
   end
 
-  return width - paddingX, height - paddingY
+  return width - paddingX
+end
+
+--- Gets the inner height
+--  @param {Boolean} ignorePadding
+--  @returns {Number}
+--  @public
+function Object:getInnerHeight(ignorePadding)
+  local height = self:getHeight()
+  local paddingY = 0
+  if self.positionMode == "relative" and not ignorePadding then
+    local top, right, bottom, left = self:getPadding()
+    paddingY = top + bottom
+  end
+
+  return height - paddingY
 end
 
 --- Gets the padding

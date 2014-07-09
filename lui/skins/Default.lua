@@ -8,6 +8,7 @@ local DefaultSkin = class("DefaultSkin")
 
 -- Colors
 DefaultSkin.windowBackgroundColor = { 112, 131, 125 }
+DefaultSkin.buttonBackgroundColor = { 112, 131, 125 }
 DefaultSkin.titleBarBackgroundColor = { 47, 67, 67 }
 
 DefaultSkin.lightColor = { 255, 255, 255, 50 }
@@ -27,7 +28,7 @@ end
 --- Draws the given window
 --  @param {Window} window
 function DefaultSkin:drawWindow(window)
-  local x, y = window:_getRealPosition()
+  local x, y = window:getPosition()
 
   love.graphics.setFont(self.font)
 
@@ -36,36 +37,30 @@ function DefaultSkin:drawWindow(window)
   self:drawWindowTitleBarContent(window, x, y)
 end
 
+--- Draws the given button
+--  @param {Button} button
+function DefaultSkin:drawButton(button)
+  local x, y = button:getPosition()
+  local width, height = button:getSize()
+
+  love.graphics.setColor(self.buttonBackgroundColor)
+  love.graphics.rectangle("fill", x, y, width, height)
+
+  self:drawLighting(false, x, y, width, height)
+end
+
 --- Draws the window background
 --  @param {Window} window
 --  @param {Number} x
 --  @param {Number} y
 function DefaultSkin:drawWindowBackground(window, x, y)
-  local width = window:_evaluateNumber(window.size.width, "x")
-  local height = window:_evaluateNumber(window.size.height, "y")
+  local width, height = window:getSize()
 
   -- Draw background
   love.graphics.setColor(self.windowBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)
 
-  -- Draw light
-  local points = {
-    x + 1, y + height - 1,
-    x + 1, y,
-    x + width - 1, y
-  }
-  love.graphics.setColor(self.lightColor)
-  love.graphics.line(points)
-
-  -- Draw shadow
-  local points = {
-    x + width, y,
-    x + width, y + height - 1,
-    x, y + height - 1
-  }
-  love.graphics.setColor(self.shadowColor)
-  love.graphics.setLineStyle("rough")
-  love.graphics.line(points)
+  self:drawLighting(false, x, y, width, height)
 
   -- Reset color
   love.graphics.setColor(255, 255, 255)
@@ -97,23 +92,31 @@ end
 --  @param {Number} width
 --  @param {Number} height
 function DefaultSkin:drawLighting(inset, x, y, width, height)
-  -- Draw shadow
+  -- Draw top left
   local points = {
     x, y + height,
     x, y,
     x + width + 1, y
   }
-  love.graphics.setColor(self.shadowColor)
+  if inset == true then
+    love.graphics.setColor(self.shadowColor)
+  else
+    love.graphics.setColor(self.lightColor)
+  end
   love.graphics.setLineStyle("rough")
   love.graphics.line(points)
 
-  -- Draw light
+  -- Draw bottom right
   local points = {
     x + width + 1, y,
     x + width + 1, y + height,
     x, y + height
   }
-  love.graphics.setColor(self.lightColor)
+  if inset == true then
+    love.graphics.setColor(self.lightColor)
+  else
+    love.graphics.setColor(self.shadowColor)
+  end
   love.graphics.setLineStyle("rough")
   love.graphics.line(points)
 

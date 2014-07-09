@@ -12,27 +12,31 @@ function Object:initialize(lui)
 
   EventEmitter.initialize(self)
 
+  self.parent = nil
   self.children = {}
 
   -- Decides whether `position` should be relative to its parent
   -- or absolute (= relative to screen / window)
-  self.positionMode = "relative"
+  -- self.positionMode = "relative"
 
   -- States
-  self.dragging = false
-  self.hovering = false
+  self.isVisible = true
+  self.isDraggable = false
+
+  self.isDragging = false
+  self.isHovering = false
 
   self.size = { width = 0, height = 0 }
   self.position = { x = 0, y = 0 }
   self.padding = { x = 0, y = 0 }
-
-  self.isVisible = false
-  self.isDraggable = false
 end
 
 --- Update method
 --  @param {Number} dt
 function Object:update(dt)
+  -- Don't update if invisible!
+  if not self.isVisible then return end
+
   self:_handleMouse(dt)
 
   -- Update children
@@ -43,29 +47,31 @@ end
 
 --- Draws the object
 function Object:draw()
+  -- Don't draw if invisible!
+  if not self.isVisible then return end
+
   -- Draw children
   self:eachChild(function (object)
     object:draw()
   end)
 end
 
---- Gets the drawing position (considering positionMode, offset etc.)
---  @returns {Number, Number}
---  @private
-function Object:_getRealPosition()
-  local x = self:_evaluateNumber(self.position.x, "x")
-  local y = self:_evaluateNumber(self.position.y, "y")
-  return x, y
-end
-
 --- If the given value is a string containing %, this
---  function converts it to a number
+--  function converts it to a number. `ownSize` specifies
+--  whether the pixel values should be calculated based on
+--  its own size (true) or the parent's size (false)
 --  @param {String|Number} value
 --  @param {Number} direction
+--  @param {Boolean} ownSize
 --  @returns {Number}
 --  @private
-function Object:_evaluateNumber(value, direction)
+function Object:_evaluateNumber(value, direction, ownSize)
   assert(direction, "Object:_evaluateNumber needs a direction")
+
+  local baseObject = self.parent
+  if ownSize then
+    baseObject = self
+  end
 
   if type(value) == "string" then
     assert(string.find(value, "%%"), "Value " .. value .. " is a string, but does not contain `%`.")
@@ -75,10 +81,10 @@ function Object:_evaluateNumber(value, direction)
 
     -- Get parent size
     if direction == "x" then
-      local width = self.parent.size.width
+      local width = baseObject:_evaluateNumber(baseObject.size.width, "x")
       return width / 100 * value
     elseif direction == "y" then
-      local height = self.parent.size.height
+      local height = baseObject:_evaluateNumber(baseObject.size.height, "y")
       return height / 100 * value
     end
   else
@@ -103,7 +109,7 @@ function Object:_handleHover()
   -- Don't change hovered state when dragging
   if self.dragging then return end
 
-  local x, y = self:_getRealPosition()
+  local x, y = self:getPosition()
   local width = self:_evaluateNumber(self.size.width, "x")
   local height = self:_evaluateNumber(self.size.height, "y")
 
@@ -133,25 +139,25 @@ function Object:_handleDragging()
   -- Handle dragging state
   local mouseDown = love.mouse.isDown("l")
   local mouseOnDraggingArea = self:_isMouseOnDraggingArea()
-  if mouseDown and not self.dragging and mouseOnDraggingArea then
+  if mouseDown and not self.isDragging and mouseOnDraggingArea then
     -- Not dragging but mouse is down, start dragging
     local x, y = love.mouse.getPosition()
     self.lastDragPosition = {
       x = x,
       y = y
     }
-    self.dragging = true
-  elseif not mouseDown and self.dragging then
+    self.isDragging = true
+  elseif not mouseDown and self.isDragging then
     -- Mouse is not down but dragging still active, stop dragging
-    self.dragging = false
-  elseif mouseDown and self.dragging then
+    self.isDragging = false
+  elseif mouseDown and self.isDragging then
     -- Dragging
     self:_updateDragging()
   end
 
   -- If we're dragging, we're also hovering
-  if self.dragging then
-    self.hovering = true
+  if self.isDragging then
+    self.isHovering = true
   end
 end
 
@@ -165,7 +171,7 @@ function Object:_updateDragging()
   local distX, distY = x - lastX, y - lastY
 
   -- Add distance to current position
-  local windowX, windowY = self:_getRealPosition()
+  local windowX, windowY = self:getPosition()
   self:setPosition(windowX + distX, windowY + distY)
 
   self.lastDragPosition.x = x
@@ -181,7 +187,7 @@ function Object:_isMouseOnDraggingArea()
     return false
   end
 
-  local x, y = self:_getRealPosition()
+  local x, y = self:getPosition()
   local mouseX, mouseY = love.mouse.getPosition()
   local mousePosition = { x = mouseX, y = mouseY }
   local draggingArea = {
@@ -197,10 +203,50 @@ end
   Public methods
 ]]--
 
+--- Gets the drawing position (considering offset etc.)
+--  @returns {Number, Number}
+--  @public
+function Object:getPosition()
+  local x = self:_evaluateNumber(self.position.x, "x")
+  local y = self:_evaluateNumber(self.position.y, "y")
+
+  if self.parent then
+    -- Add parent offset
+    local parentX, parentY = self.parent:getPosition()
+    x = x + parentX
+    y = y + parentY
+
+    -- Add parent padding
+    local parentPaddingX, parentPaddingY = self.parent:getPadding()
+    x = x + parentPaddingX
+    y = y + parentPaddingY
+  end
+
+  return x, y
+end
+
+--- Gets the drawing size
+--  @returns {Number, Number}
+--  @public
+function Object:getSize()
+  local width = self:_evaluateNumber(self.size.width, "x")
+  local height = self:_evaluateNumber(self.size.height, "y")
+  return width, height
+end
+
+--- Gets the padding
+--  @returns {Number, Number}
+--  @private
+function Object:getPadding()
+  local x = self:_evaluateNumber(self.padding.x, "x", true)
+  local y = self:_evaluateNumber(self.padding.y, "y", true)
+  return x, y
+end
+
 --- Calls fn for each child
 --  @param {Function} fn
 --  @param {Boolean} recursive
---  @private
+--  @public
 function Object:eachChild(fn, recursive)
   for _, child in pairs(self.children) do
     fn(child)
@@ -212,31 +258,56 @@ end
 
 --- Adds a child to this object
 --  @param {Object} object
+--  @public
 function Object:addChild(object)
   self.children[#self.children + 1] = object
-  object.parent = self
+  object:setParent(self)
 end
 
 --- Displays the object
+--  @public
 function Object:show()
   self.isVisible = true
 end
 
 --- Hides the object
+--  @public
 function Object:hide()
   self.isVisible = false
 end
 
--- Sets the position
+--- Sets the position
+--  @param {Number|String} x
+--  @param {Number|String} y
+--  @public
 function Object:setPosition(x, y)
   if x ~= nil then self.position.x = x end
   if y ~= nil then self.position.y = y end
 end
 
--- Sets the size
+--- Sets the size
+--  @param {Number|String} width
+--  @param {Number|String} height
+--  @public
 function Object:setSize(width, height)
   if width ~= nil then self.size.width = width end
   if height ~= nil then self.size.height = height end
+end
+
+--- Sets the padding
+--  @param {Number|String} x
+--  @param {Number|String} y
+--  @public
+function Object:setPadding(x, y)
+  if x ~= nil then self.padding.x = x end
+  if y ~= nil then self.padding.y = y end
+end
+
+--- Sets the parent
+--  @param {Object} object
+--  @public
+function Object:setParent(object)
+  self.parent = object
 end
 
 return Object

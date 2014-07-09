@@ -11,6 +11,9 @@ local Window = class("Window", Object)
 function Window:initialize(lui, title)
   Object.initialize(self, lui)
 
+  self.isVisible = false
+  self.isDraggable = true
+
   self.title = title or "New Window"
   self.size = { width = 250, height = 200 }
   self.padding = self.lui.skin.windowPadding
@@ -22,8 +25,6 @@ function Window:initialize(lui, title)
     height = self.lui.skin.windowTitleBarHeight
   }
 
-  self.isDraggable = true
-
   -- Window objects are automatically added to root
   self.lui.root:addChild(self)
 end
@@ -31,6 +32,8 @@ end
 --- Draws the window
 function Window:draw()
   self.lui.skin:drawWindow(self)
+
+  Object.draw(self)
 end
 
 return Window

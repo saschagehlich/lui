@@ -7,7 +7,7 @@ local lui = class("lui")
 lui.availableObjects = {
   "Object", "Root", "Window",
 
-  "Button", "Text"
+  "Button", "Text", "Image"
 }
 
 --- The main entry point / constructor
@@ -69,6 +69,29 @@ function lui:_updateHoverState()
       self.isHovered = object.isHovered
     end
   end, true)
+end
+
+--- Sets the cursor, remembers the object that changed it
+--  @param {String|Cursor} cursor
+--  @param {Object} object
+--  @public
+function lui:setCursor(cursor, object)
+  if type(cursor) == "string" then
+    cursor = love.mouse.getSystemCursor(cursor)
+  end
+
+  love.mouse.setCursor(cursor)
+  self.mouseCursorObject = object
+
+  object:on("removed", function()
+    self:resetCursor()
+  end)
+end
+
+--- Resets the cursor
+--  @public
+function lui:resetCursor()
+  love.mouse.setCursor()
 end
 
 --- Updates the root object

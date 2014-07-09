@@ -1,5 +1,3 @@
-
-
 local pathMatch = "(.+)%.Util$"
 local inspect = require((...):match(pathMatch) .. ".serpent").block
 
@@ -36,6 +34,14 @@ function Util.contains(array, value)
     end
   end
   return false
+end
+
+--- Rounds the given number
+--  @param {Number} num
+--  @returns {Number}
+function Util.round(num)
+  if num >= 0 then return math.floor(num+.5)
+  else return math.ceil(num-.5) end
 end
 
 return Util

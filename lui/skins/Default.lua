@@ -22,7 +22,7 @@ DefaultSkin.windowPadding = {
   bottom = 5,
   left = 5
 }
-DefaultSkin.windowTitleBarHeight = 15
+DefaultSkin.windowTitleBarHeight = 12
 
 --- Constructor
 --  @param {lui} lui
@@ -85,7 +85,7 @@ end
 --  @param {Number} y
 function DefaultSkin:drawWindowTitleBarBackground(window, x, y)
   local width = window:_evaluateNumber(window.size.width, "x") - 4
-  local height = 12
+  local height = self.windowTitleBarHeight
   local x, y = x + 2, y + 2
 
   -- Draw background

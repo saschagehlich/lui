@@ -16,11 +16,12 @@ function Object:initialize(lui)
   self.center = nil
   self.children = {}
 
-  -- Decides whether `position` should be relative to its parent
-  -- or absolute (= relative to screen / window)
-  -- self.positionMode = "relative"
+  -- `absolute` = ignore padding
+  -- `relative` = add padding to position
+  self.positionMode = "relative"
 
   -- States
+  self.isRemoved = false
   self.isVisible = true
   self.isDraggable = false
   self.isPressed = false
@@ -44,12 +45,23 @@ function Object:update(dt)
   -- Don't update if invisible!
   if not self.isVisible then return end
 
+  self:_removeDeadChildren() -- :(
+
   self:_handleMouse(dt)
 
   -- Update children
   self:eachChild(function (object)
     object:update(dt)
   end)
+end
+
+--- Removes children flagged as removed
+function Object:_removeDeadChildren()
+  for i, child in ipairs(self.children) do
+    if child.isRemoved then
+      table.remove(self.children, i)
+    end
+  end
 end
 
 --- Draws the object
@@ -91,10 +103,10 @@ function Object:_evaluateNumber(value, coordinate, ownSize)
     -- Get parent size
     if coordinate == "x" then
       local width = baseWidth
-      return width / 100 * value
+      return Util.round(width / 100 * value)
     elseif coordinate == "y" then
       local height = baseHeight
-      return height / 100 * value
+      return Util.round(height / 100 * value)
     end
   else
     return value
@@ -107,11 +119,12 @@ end
 --  @returns {Number}
 --  @private
 function Object:_evaluatePosition(position, coordinate)
+  local ignorePadding = self.positionMode == "absolute"
   if coordinate == "x" then
     if position.left then
       return self:_evaluateNumber(position.left, "x")
     elseif position.right then
-      local parentWidth, parentHeight = self.parent:getInnerSize()
+      local parentWidth, parentHeight = self.parent:getInnerSize(ignorePadding)
       local width, height = self:getInnerSize()
       local right = self:_evaluateNumber(position.right, "x")
 
@@ -121,7 +134,7 @@ function Object:_evaluatePosition(position, coordinate)
     if position.top then
       return self:_evaluateNumber(position.top, "y")
     elseif position.bottom then
-      local parentWidth, parentHeight = self.parent:getInnerSize()
+      local parentWidth, parentHeight = self.parent:getInnerSize(ignorePadding)
       local width, height = self:getInnerSize()
       local bottom = self:_evaluateNumber(position.bottom, "y")
 
@@ -277,9 +290,11 @@ function Object:getPosition()
     y = y + parentY
 
     -- Add parent padding
-    local top, right, bottom, left = self.parent:getPadding()
-    x = x + left
-    y = y + top
+    if self.positionMode == "relative" then
+      local top, right, bottom, left = self.parent:getPadding()
+      x = x + left
+      y = y + top
+    end
   end
 
   return x, y
@@ -299,7 +314,7 @@ function Object:getPositionByCenter()
     x, y = self.center.x, self.center.y
   end
 
-  return x - width / 2, y - height / 2
+  return Util.round(x - width / 2), Util.round(y - height / 2)
 end
 
 --- Returns the center position of this object
@@ -309,7 +324,7 @@ function Object:getCenterPosition()
   local x, y = self:getPosition()
   local width, height = self:getSize()
 
-  return x + width / 2, y + height / 2
+  return Util.round(x + width / 2), Util.round(y + height / 2)
 end
 
 --- Gets the drawing size
@@ -322,15 +337,20 @@ function Object:getSize()
 end
 
 --- Gets the inner size
+--  @param {Boolean} ignorePadding
 --  @returns {Number, Number}
 --  @public
-function Object:getInnerSize()
+function Object:getInnerSize(ignorePadding)
   local width, height = self:getSize()
+  local paddingX, paddingY
+  if self.positionMode == "relative" and not ignorePadding then
+    local top, right, bottom, left = self:getPadding()
 
-  local top, right, bottom, left = self:getPadding()
-
-  local paddingX = left + right
-  local paddingY = top + bottom
+    paddingX = left + right
+    paddingY = top + bottom
+  else
+    paddingX, paddingY = 0, 0
+  end
 
   return width - paddingX, height - paddingY
 end
@@ -457,11 +477,36 @@ function Object:setPadding(top, right, bottom, left)
   end
 end
 
+--- Sets the position mode
+--  @param {String} positionMode (absolute|relative)
+--  @public
+function Object:setPositionMode(positionMode)
+  assert(
+    Util.contains({ "absolute", "relative" }, positionMode),
+    "Object:setPositionMode: Invalid mode: " .. positionMode ..
+    " (available options: relative, absolute)"
+  )
+
+  self.positionMode = positionMode
+end
+
 --- Sets the parent
 --  @param {Object} object
 --  @public
 function Object:setParent(object)
   self.parent = object
+end
+
+--- Removes this object and all its children
+--  @public
+function Object:remove()
+  self.isRemoved = true
+
+  self:eachChild(function (child)
+    child:remove()
+  end)
+
+  self:emit("removed")
 end
 
 return Object

@@ -11,7 +11,7 @@ local Button = class("Button", Object)
 function Button:initialize(lui, text)
   Object.initialize(self, lui)
 
-  self.text = text
+  self.text = text or ""
   self.size = { width = 100, height = 30 }
   self.showPointer = true
 
@@ -32,8 +32,7 @@ end
 --  @public
 function Button:onHover()
   if self.showPointer then
-    local pointer = love.mouse.getSystemCursor("hand")
-    love.mouse.setCursor(pointer)
+    self.lui:setCursor("hand", self)
   end
 end
 
@@ -41,7 +40,7 @@ end
 --  @public
 function Button:onBlur()
   if self.showPointer then
-    love.mouse.setCursor()
+    self.lui:resetCursor()
   end
 end
 
@@ -56,7 +55,9 @@ end
 
 --- Draws the Button
 function Button:draw()
-  self.lui.skin:drawButton(self)
+  if self.isVisible then
+    self.lui.skin:drawButton(self)
+  end
 
   Object.draw(self)
 end

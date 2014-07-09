@@ -10,6 +10,7 @@ function love.load()
   local window = gui:createWindow("Window title")
   window:setSize(300, 250)
   window:setCenter()
+  window:setShowCloseButton(true)
   window:show()
 
   local button = gui:createButton("OK")

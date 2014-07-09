@@ -28,14 +28,14 @@ DefaultSkin.windowTitleBarHeight = 15
 function DefaultSkin:initialize(lui)
   self.lui = lui
   self.font = love.graphics.newFont(basePath .. "/skins/Default/66amagasaki.ttf", 8)
+  self.windowTitleFont = self.font
+  self.buttonFont = self.font
 end
 
 --- Draws the given window
 --  @param {Window} window
 function DefaultSkin:drawWindow(window)
   local x, y = window:getPosition()
-
-  love.graphics.setFont(self.font)
 
   self:drawWindowBackground(window, x, y)
   self:drawWindowTitleBarBackground(window, x, y)
@@ -134,6 +134,8 @@ end
 --  @param {Number} x
 --  @param {Number} y
 function DefaultSkin:drawWindowTitleBarContent(window, x, y)
+  love.graphics.setFont(self.windowTitleFont)
+
   local width = window:_evaluateNumber(window.size.width, "x")
   love.graphics.printf(window.title, x, y + 3, width, "center")
 end

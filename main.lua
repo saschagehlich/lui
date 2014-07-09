@@ -14,7 +14,6 @@ function love.load()
 
   local button = gui:createButton("Button caption")
   button:setPosition(0, 0)
-  button:setSize("100%", "100%")
   window:addChild(button)
 end
 

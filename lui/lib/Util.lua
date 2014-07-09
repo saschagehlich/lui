@@ -25,4 +25,17 @@ function Util.inspect(object)
   return inspect(object)
 end
 
+--- Checks whether the given table contains the given value
+--  @param {Table} array
+--  @param {?} value
+--  @returns {Boolean}
+function Util.contains(array, value)
+  for _, val in ipairs(array) do
+    if val == value then
+      return true
+    end
+  end
+  return false
+end
+
 return Util

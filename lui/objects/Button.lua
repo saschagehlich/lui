@@ -13,6 +13,11 @@ function Button:initialize(lui, text)
 
   self.text = text
   self.size = { width = 100, height = 50 }
+
+  self.textObject = self.lui:createText(self.text)
+  self.textObject:setSize("100%", "100%")
+  self.textObject:setAlignment("center", "center")
+  self:addChild(self.textObject)
 end
 
 --- Draws the Button

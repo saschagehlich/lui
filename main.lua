@@ -10,12 +10,11 @@ function love.load()
   local window = gui:createWindow("Window title")
   window:setPosition("10%", "10%")
   window:setSize("80%", "80%")
-  window:setPadding("10%", "10%")
   window:show()
 
   local button = gui:createButton("Button caption")
   button:setPosition(0, 0)
-  button:setSize(100, 100)
+  button:setSize("100%", "100%")
   window:addChild(button)
 end
 

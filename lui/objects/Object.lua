@@ -28,7 +28,12 @@ function Object:initialize(lui)
 
   self.size = { width = 0, height = 0 }
   self.position = { x = 0, y = 0 }
-  self.padding = { x = 0, y = 0 }
+  self.padding = {
+    top = 0,
+    left = 0,
+    right = 0,
+    bottom = 0
+  }
 end
 
 --- Update method
@@ -74,6 +79,8 @@ function Object:_evaluateNumber(value, direction, ownSize)
   end
 
   if type(value) == "string" then
+    local baseWidth, baseHeight = baseObject:getInnerSize()
+
     assert(string.find(value, "%%"), "Value " .. value .. " is a string, but does not contain `%`.")
 
     -- Remove %
@@ -81,10 +88,10 @@ function Object:_evaluateNumber(value, direction, ownSize)
 
     -- Get parent size
     if direction == "x" then
-      local width = baseObject:_evaluateNumber(baseObject.size.width, "x")
+      local width = baseWidth
       return width / 100 * value
     elseif direction == "y" then
-      local height = baseObject:_evaluateNumber(baseObject.size.height, "y")
+      local height = baseHeight
       return height / 100 * value
     end
   else
@@ -217,9 +224,9 @@ function Object:getPosition()
     y = y + parentY
 
     -- Add parent padding
-    local parentPaddingX, parentPaddingY = self.parent:getPadding()
-    x = x + parentPaddingX
-    y = y + parentPaddingY
+    local top, right, bottom, left = self.parent:getPadding()
+    x = x + left
+    y = y + top
   end
 
   return x, y
@@ -234,13 +241,32 @@ function Object:getSize()
   return width, height
 end
 
+--- Gets the inner size
+--  @returns {Number, Number}
+--  @public
+function Object:getInnerSize()
+  local width, height = self:getSize()
+
+  local top, right, bottom, left = 0, 0, 0, 0
+  if self.parent then
+    top, right, bottom, left = self.parent:getPadding()
+  end
+
+  local paddingX = left + right
+  local paddingY = top + bottom
+
+  return width - paddingX, height - paddingY
+end
+
 --- Gets the padding
 --  @returns {Number, Number}
 --  @private
 function Object:getPadding()
-  local x = self:_evaluateNumber(self.padding.x, "x", true)
-  local y = self:_evaluateNumber(self.padding.y, "y", true)
-  return x, y
+  local top = self:_evaluateNumber(self.padding.top, "y", true)
+  local right = self:_evaluateNumber(self.padding.right, "x", true)
+  local bottom = self:_evaluateNumber(self.padding.bottom, "y", true)
+  local left = self:_evaluateNumber(self.padding.left, "x", true)
+  return top, right, bottom, left
 end
 
 --- Calls fn for each child
@@ -295,12 +321,16 @@ function Object:setSize(width, height)
 end
 
 --- Sets the padding
---  @param {Number|String} x
---  @param {Number|String} y
+--  @param {Number|String} top
+--  @param {Number|String} right
+--  @param {Number|String} bottom
+--  @param {Number|String} left
 --  @public
-function Object:setPadding(x, y)
-  if x ~= nil then self.padding.x = x end
-  if y ~= nil then self.padding.y = y end
+function Object:setPadding(top, right, bottom, left)
+  if top ~= nil then self.padding.top = top end
+  if right ~= nil then self.padding.right = right end
+  if bottom ~= nil then self.padding.bottom = bottom end
+  if left ~= nil then self.padding.left = left end
 end
 
 --- Sets the parent

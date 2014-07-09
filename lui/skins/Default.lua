@@ -15,7 +15,12 @@ DefaultSkin.lightColor = { 255, 255, 255, 50 }
 DefaultSkin.shadowColor = { 0, 0, 0, 50 }
 
 -- Spacings
-DefaultSkin.windowPadding = { x = 5, y = 30 }
+DefaultSkin.windowPadding = {
+  top = 20,
+  right = 5,
+  bottom = 5,
+  left = 5
+}
 DefaultSkin.windowTitleBarHeight = 15
 
 --- Constructor
@@ -41,7 +46,7 @@ end
 --  @param {Button} button
 function DefaultSkin:drawButton(button)
   local x, y = button:getPosition()
-  local width, height = button:getSize()
+  local width, height = button:getInnerSize()
 
   love.graphics.setColor(self.buttonBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)

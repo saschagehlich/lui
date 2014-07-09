@@ -13,6 +13,7 @@ function Object:initialize(lui)
   EventEmitter.initialize(self)
 
   self.parent = nil
+  self.center = nil
   self.children = {}
 
   -- Decides whether `position` should be relative to its parent
@@ -262,6 +263,10 @@ end
 --  @returns {Number, Number}
 --  @public
 function Object:getPosition()
+  if self.center then
+    return self:getPositionByCenter()
+  end
+
   local x = self:_evaluatePosition(self.position, "x")
   local y = self:_evaluatePosition(self.position, "y")
 
@@ -278,6 +283,33 @@ function Object:getPosition()
   end
 
   return x, y
+end
+
+--- Gets the position by the currently set `center` object / position
+--  @returns {Number, Number}
+--  @public
+function Object:getPositionByCenter()
+  local center = self.center
+  local width, height = self:getSize()
+  local x, y
+
+  if center.class then
+    x, y = center:getCenterPosition()
+  else
+    x, y = self.center.x, self.center.y
+  end
+
+  return x - width / 2, y - height / 2
+end
+
+--- Returns the center position of this object
+--  @returns {Number, Number}
+--  @public
+function Object:getCenterPosition()
+  local x, y = self:getPosition()
+  local width, height = self:getSize()
+
+  return x + width / 2, y + height / 2
 end
 
 --- Gets the drawing size
@@ -348,6 +380,24 @@ function Object:hide()
   self.isVisible = false
 end
 
+--- Centers this object inside the given object
+--  @param {Object|Number} x
+--  @param {Number} y
+--  @public
+function Object:setCenter(x, y)
+  local position
+  if not x then
+    -- Not passing anything, use parent for center position
+    self.center = self.parent
+  elseif not x.class then
+    -- Passing an object, use it for center position
+    self.center = x
+  elseif type(x) ~= "table" then
+    -- Passing a fixed center position (two parameters)
+    self.center = { x = x, y = y }
+  end
+end
+
 --- Sets the position
 --  Object:setPosition(x, y)
 --    @param {Number|String} x
@@ -372,6 +422,9 @@ function Object:setPosition(x, y)
       top = y
     }
   end
+
+  -- Unset center object when moving
+  self.center = nil
 end
 
 --- Sets the size
@@ -379,21 +432,29 @@ end
 --  @param {Number|String} height
 --  @public
 function Object:setSize(width, height)
-  if width ~= nil then self.size.width = width end
-  if height ~= nil then self.size.height = height end
+  self.size.width = width
+  self.size.height = height
 end
 
 --- Sets the padding
 --  @param {Number|String} top
 --  @param {Number|String} right
---  @param {Number|String} bottom
---  @param {Number|String} left
+--  @param {Number|String} bottom (optional)
+--  @param {Number|String} left (optional)
 --  @public
 function Object:setPadding(top, right, bottom, left)
-  if top ~= nil then self.padding.top = top end
-  if right ~= nil then self.padding.right = right end
-  if bottom ~= nil then self.padding.bottom = bottom end
-  if left ~= nil then self.padding.left = left end
+  if bottom == nil and left == nil then
+    local vertical, horizontal = top, right
+    self.padding.top = vertical
+    self.padding.right = horizontal
+    self.padding.bottom = vertical
+    self.padding.left = horizontal
+  else
+    self.padding.top = top
+    self.padding.right = right
+    self.padding.bottom = bottom
+    self.padding.left = left
+  end
 end
 
 --- Sets the parent

@@ -412,36 +412,48 @@ function Object:hide()
   self.isVisible = false
 end
 
---- Centers this object inside the given object
---  @param {Object|Number} x
+--- Centers this object
+--  @param {Number} x
 --  @param {Number} y
 --  @param {Boolean} centerX
 --  @param {Boolean} centerY
 --  @public
+--
+--  Possible signatures:
+--    Object:setCenter([Boolean centerX, Boolean centerY])
+--      Moves to the center of the parent. `centerX` and `centerY` specify
+--      if object should be centered on the x or y axis
+--    Object:setCenter(Number x, Number y[, Boolean centerX, Boolean centerY])
+--      Same as above with fixed center point (x,y)
+--    Object:setCenter(Object[, Boolean centerX, centerY])
+--      Same as above with fixed center object
 function Object:setCenter(x, y, centerX, centerY)
-  -- setCenter(x, y)
+  local centerPoint
+
+  -- setCenter(number, number)
   if type(x) == "number" then
-    self.center = { x = x, y = y }
-    return
+    centerPoint = { x = x, y = y }
   end
 
   -- setCenter(Object)
   if type(x) == "table" then
-    self.center = x
-    return
+    centerPoint = x
+    centerX = y
+    centerY = centerX
   end
 
   -- setCenter() / setCenter(bool, bool)
-  if type(x) == "boolean" or x == nil then
-    local centerX = x
-    if centerX == nil then centerX = true end
-    local centerY = y
-    if centerY == nil then centerY = true end
-
-    self.center = self.parent
-    self.centerFlags = { x = centerX, y = centerY }
-    return
+  if type(x) == "boolean" then
+    centerPoint = self.parent
+    centerX = x
+    centerY = y
   end
+
+  if centerX == nil then centerX = true end
+  if centerY == nil then centerY = true end
+
+  self.center = centerPoint
+  self.centerFlags = { x = centerX, y = centerY }
 end
 
 --- Sets the position

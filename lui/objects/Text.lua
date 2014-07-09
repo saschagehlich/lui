@@ -12,6 +12,7 @@ local Text = class("Text", Object)
 function Text:initialize(lui, text)
   Object.initialize(self, lui)
 
+  self.size = { width = nil, height = nil }
   self.text = text
   self.alignment = {
     x = "left",
@@ -23,21 +24,16 @@ end
 function Text:draw()
   local x, y = self:getPosition()
   local width, height = self:getSize()
-  local font = self.lui.skin.buttonFont
 
-  local lineHeight = font:getLineHeight() * font:getHeight()
-
-  local textWidth, lines = font:getWrap(self.text, width)
-  local totalTextHeight = lines * lineHeight
-
-  love.graphics.setFont(font)
+  local textWidth, textHeight = self:getTextSize()
 
   if self.alignment.y == "center" then
-    y = y + height / 2 - totalTextHeight / 2
+    y = y + height / 2 - textHeight / 2
   elseif self.alignment.y == "bottom" then
-    y = y + (height - totalTextHeight)
+    y = y + (height - textHeight)
   end
 
+  love.graphics.setColor(0, 0, 0)
   love.graphics.printf(self.text, x, y, width, self.alignment.x)
 
   Object.draw(self)
@@ -65,6 +61,55 @@ end
 --  @public
 function Text:setText(text)
   self.text = text
+end
+
+--- If size.width is set to nil, this will return the text width
+--  @returns {Number}
+--  @public
+function Text:getWidth()
+  if self.size.width ~= nil then
+    return Object.getWidth(self)
+  else
+    local width, height = self:getTextSize()
+    return width
+  end
+end
+
+--- If size.height is set to nil, this will return the text height
+--  @returns {Number}
+--  @public
+function Text:getHeight()
+  if self.size.height ~= nil then
+    return Object.getHeight(self)
+  else
+    local width, height = self:getTextSize()
+    return height
+  end
+end
+
+function Text:getTextSize()
+  local width
+  if self.size.width then
+    width = self:getWidth()
+  else
+    width = self.maxWidth
+  end
+
+  local font = self.lui.skin.buttonFont
+  local lineHeight = font:getLineHeight() * font:getHeight()
+
+  love.graphics.setFont(font)
+
+  local textWidth
+  if width then
+    textWidth, lines = font:getWrap(self.text, width)
+    totalTextHeight = lines * lineHeight
+  else
+    textWidth = font:getWidth(self.text)
+    totalTextHeight = lineHeight
+  end
+
+  return textWidth, totalTextHeight
 end
 
 return Text

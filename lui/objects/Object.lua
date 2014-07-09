@@ -434,15 +434,21 @@ end
 --  @returns {Number, Number}
 --  @public
 function Object:getSize()
-  local width = self:_evaluateNumber(self.size.width, "x")
-  local height = self:_evaluateNumber(self.size.height, "y")
+  local width = self:getWidth()
+  local height = self:getHeight()
   return width, height
 end
 
+--- Gets the drawing width
+--  @returns {Number}
+--  @public
 function Object:getWidth()
   return self:_evaluateNumber(self.size.width, "x")
 end
 
+--- Gets the drawing height
+--  @returns {Number}
+--  @public
 function Object:getHeight()
   return self:_evaluateNumber(self.size.height, "y")
 end

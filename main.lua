@@ -18,6 +18,9 @@ function love.load()
   panel:setPosition(0, 60)
   panel:setSize("100%", "100% - y")
   window:addChild(panel)
+
+  local text = gui:createText("This is some random text which is kinda long yo.")
+  window:addChild(text)
 end
 
 function love.update(dt)

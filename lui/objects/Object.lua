@@ -213,10 +213,18 @@ function Object:_handleDragging()
   if mouseDown and not self.isDragging and mouseOnDraggingArea then
     -- Not dragging but mouse is down, start dragging
     local x, y = love.mouse.getPosition()
-    self.lastDragPosition = {
+
+    self.startDragPosition = {
       x = x,
       y = y
     }
+
+    local startX, startY = self:getPosition()
+    self.startPosition = {
+      x = startX,
+      y = startY
+    }
+
     self.isDragging = true
   elseif not mouseDown and self.isDragging then
     -- Mouse is not down but dragging still active, stop dragging
@@ -236,14 +244,18 @@ end
 --  @private
 function Object:_updateDragging()
   local x, y = love.mouse:getPosition()
-  local lastX, lastY = self.lastDragPosition.x, self.lastDragPosition.y
+  local startDragX, startDragY =
+    self.startDragPosition.x,
+    self.startDragPosition.y
+  local startX, startY =
+    self.startPosition.x,
+    self.startPosition.y
 
   -- Calculate distance
-  local distX, distY = x - lastX, y - lastY
+  local distX, distY = x - startDragX, y - startDragY
 
   -- Add distance to current position
-  local selfX, selfY = self:getPosition()
-  local posX, posY = selfX + distX, selfY + distY
+  local posX, posY = startX + distX, startY + distY
   local width, height = self:getSize()
 
   -- If this object is locked to another object, make sure we can't drag
@@ -259,9 +271,6 @@ function Object:_updateDragging()
   end
 
   self:setPosition(posX, posY)
-
-  self.lastDragPosition.x = x
-  self.lastDragPosition.y = y
 end
 
 --- Is the mouse on the title bar?

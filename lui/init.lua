@@ -5,7 +5,7 @@ local DefaultSkin = require(path .. ".skins.Default")
 local lui = class("lui")
 
 lui.availableObjects = {
-  "Object", "Window"
+  "Object", "Window", "Root"
 }
 
 --- The main entry point / constructor
@@ -20,7 +20,7 @@ function lui:initialize(config)
 
   self:_buildCreators()
 
-  self.root = self:createObject()
+  self.root = self:createRoot()
 end
 
 --- Builds `lui:create{ObjectName}` methods for all available object types

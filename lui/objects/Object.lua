@@ -47,7 +47,37 @@ end
 --  @returns {Number, Number}
 --  @private
 function Object:_getRealPosition()
-  return self.position.x, self.position.y
+  local x = self:_evaluateNumber(self.position.x, "x")
+  local y = self:_evaluateNumber(self.position.y, "y")
+  return x, y
+end
+
+--- If the given value is a string containing %, this
+--  function converts it to a number
+--  @param {String|Number} value
+--  @param {Number} direction
+--  @returns {Number}
+--  @private
+function Object:_evaluateNumber(value, direction)
+  assert(direction, "Object:_evaluateNumber needs a direction")
+
+  if type(value) == "string" then
+    assert(string.find(value, "%%"), "Value " .. value .. " is a string, but does not contain `%`.")
+
+    -- Remove %
+    value = string.gsub(value, "%%", "")
+
+    -- Get parent size
+    if direction == "x" then
+      local width = self.parent.size.width
+      return width / 100 * value
+    elseif direction == "y" then
+      local height = self.parent.size.height
+      return height / 100 * value
+    end
+  else
+    return value
+  end
 end
 
 --- Handles mouse interaction
@@ -55,7 +85,8 @@ end
 --  @private
 function Object:_handleMouse(dt)
   local x, y = self:_getRealPosition()
-  local width, height = self.size.width, self.size.height
+  local width = self:_evaluateNumber(self.size.width, "x")
+  local height = self:_evaluateNumber(self.size.height, "y")
 
   -- Rectangular intersection
   local mouseX, mouseY = love.mouse.getPosition()
@@ -63,21 +94,17 @@ function Object:_handleMouse(dt)
     mouseX > x + width or
     mouseY < y or
     mouseY > y + height) then
-
       -- Update hovered state, emit `hover` event
       if not self.hovered then
         self:emit("hover", self)
         self.hovered = true
       end
-
   else
-
     -- Update hovered state, emit `blur` event
     if self.hovered then
       self.hovered = false
       self:emit("blur", self)
     end
-
   end
 end
 
@@ -119,6 +146,12 @@ end
 function Object:setPosition(x, y)
   if x ~= nil then self.position.x = x end
   if y ~= nil then self.position.y = y end
+end
+
+-- Sets the size
+function Object:setSize(width, height)
+  if width ~= nil then self.size.width = width end
+  if height ~= nil then self.size.height = height end
 end
 
 return Object

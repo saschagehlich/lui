@@ -2,6 +2,7 @@ local pathMatch = "(.+)%.skins.Default$"
 local basePath = (...):match(pathMatch)
 
 local class = require(basePath .. ".lib.middleclass")
+local Object = require(basePath .. ".objects.Object")
 
 local DefaultSkin = class("DefaultSkin")
 
@@ -40,7 +41,8 @@ end
 --  @param {Number} x
 --  @param {Number} y
 function DefaultSkin:drawWindowBackground(window, x, y)
-  local width, height = window.size.width, window.size.height
+  local width = window:_evaluateNumber(window.size.width, "x")
+  local height = window:_evaluateNumber(window.size.height, "y")
 
   -- Draw background
   love.graphics.setColor(self.windowBackgroundColor)
@@ -74,7 +76,8 @@ end
 --  @param {Number} x
 --  @param {Number} y
 function DefaultSkin:drawWindowTitleBarBackground(window, x, y)
-  local width, height = window.size.width - 4, 12
+  local width = window:_evaluateNumber(window.size.width, "x") - 4
+  local height = 12
   local x, y = x + 2, y + 2
 
   -- Draw background
@@ -110,7 +113,7 @@ end
 --  @param {Number} x
 --  @param {Number} y
 function DefaultSkin:drawWindowTitleBarContent(window, x, y)
-  local width = window.size.width
+  local width = window:_evaluateNumber(window.size.width, "x")
   love.graphics.printf(window.title, x, y + 3, width, "center")
 end
 

@@ -14,6 +14,7 @@ function Object:initialize(lui)
 
   self.parent = nil
   self.center = nil
+  self.lockedToObject = nil
   self.centerFlags = { x = false, y = false }
   self.children = {}
 
@@ -241,8 +242,23 @@ function Object:_updateDragging()
   local distX, distY = x - lastX, y - lastY
 
   -- Add distance to current position
-  local windowX, windowY = self:getPosition()
-  self:setPosition(windowX + distX, windowY + distY)
+  local selfX, selfY = self:getPosition()
+  local posX, posY = selfX + distX, selfY + distY
+  local width, height = self:getSize()
+
+  -- If this object is locked to another object, make sure we can't drag
+  -- it outside
+  if self.lockedToObject then
+    local lockedX, lockedY = self.lockedToObject:getPosition()
+    local lockedWidth, lockedHeight = self.lockedToObject:getSize()
+
+    posX = math.max(lockedX, posX) -- left boundary
+    posX = math.min(posX, lockedX + lockedWidth - width) -- right boundary
+    posY = math.max(lockedY, posY) -- top boundary
+    posY = math.min(posY, lockedY + lockedHeight - height) -- bottom boundary
+  end
+
+  self:setPosition(posX, posY)
 
   self.lastDragPosition.x = x
   self.lastDragPosition.y = y
@@ -545,6 +561,13 @@ function Object:remove()
   end)
 
   self:emit("removed")
+end
+
+--- Sets the object that this object is locked to. If this object is
+--  draggable, the user won't be able to drag it outside the given object.
+--  @param {Object} object
+function Object:setLockedTo(object)
+  self.lockedToObject = object
 end
 
 return Object

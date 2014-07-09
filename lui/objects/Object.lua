@@ -148,8 +148,7 @@ function Object:_handleHover()
   if self.dragging then return end
 
   local x, y = self:getPosition()
-  local width = self:_evaluateNumber(self.size.width, "x")
-  local height = self:_evaluateNumber(self.size.height, "y")
+  local width, height = self:getSize()
 
   -- Rectangular intersection
   local mouseX, mouseY = love.mouse.getPosition()

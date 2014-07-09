@@ -51,7 +51,7 @@ function DefaultSkin:drawButton(button)
 
   local color = self.buttonBackgroundColor
   local lightingInset = false
-  if button.isPressed then
+  if button.isPressed or button.isToggled then
     color = self.buttonPressedBackgroundColor
     lightingInset = true
   end

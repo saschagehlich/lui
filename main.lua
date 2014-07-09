@@ -14,6 +14,7 @@ function love.load()
 
   local button = gui:createButton("OK")
   button:setPosition({ bottom = 0, right = 0 })
+  button:setToggleable(true)
   window:addChild(button)
 end
 

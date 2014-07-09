@@ -443,7 +443,7 @@ function Object:setCenter(x, y, centerX, centerY)
   end
 
   -- setCenter() / setCenter(bool, bool)
-  if type(x) == "boolean" then
+  if type(x) == "boolean" or x == nil then
     centerPoint = self.parent
     centerX = x
     centerY = y

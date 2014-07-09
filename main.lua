@@ -9,15 +9,21 @@ function love.load()
 
   local window = gui:createWindow("Window title")
   window:setSize(300, 250)
-  window:setPosition(0, "10%")
-  window:setCenter(true, false)
-  window:setShowCloseButton(true)
   window:show()
+  window:setCenter()
 
   local button = gui:createButton("OK")
   button:setPosition({ bottom = 0, right = 0 })
-  button:setToggleable(true)
+  button:on("click", function()
+    window:remove()
+  end)
   window:addChild(button)
+
+  local text = gui:createText("Yo sup?")
+  text:setAlignment("center", "center")
+  text:setSize("100%", "100%")
+  window:addChild(text)
+  text:setCenter()
 
   button:setCenter(true, false)
 end

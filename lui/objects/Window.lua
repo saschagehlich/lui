@@ -1,7 +1,8 @@
 local pathMatch = "(.+)%.objects.Window$"
+local basePath = (...):match(pathMatch)
 
-local class = require((...):match(pathMatch) .. ".lib.middleclass")
-local Object = require((...):match(pathMatch) .. ".objects.Object")
+local class = require(basePath .. ".lib.middleclass")
+local Object = require(basePath .. ".objects.Object")
 
 local Window = class("Window", Object)
 
@@ -44,7 +45,8 @@ function Window:_createCloseButton()
   self.closeButton:on("click", self._onCloseClick, self)
   self:addChild(self.closeButton)
 
-  self.closeImage = self.lui:createImage("lui/objects/window/close.png")
+  local basePathSlashes = basePath:gsub("%.", "/")
+  self.closeImage = self.lui:createImage(basePathSlashes .. "/objects/window/close.png")
   self.closeButton:addChild(self.closeImage)
 
   self.closeImage:setCenter()

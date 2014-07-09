@@ -110,8 +110,8 @@ function Object:_evaluatePosition(position, coordinate)
     if position.left then
       return self:_evaluateNumber(position.left, "x")
     elseif position.right then
-      local parentWidth, parentHeight = self.parent:getSize()
-      local width, height = self:getSize()
+      local parentWidth, parentHeight = self.parent:getInnerSize()
+      local width, height = self:getInnerSize()
       local right = self:_evaluateNumber(position.right, "x")
 
       return parentWidth - width - right
@@ -120,8 +120,8 @@ function Object:_evaluatePosition(position, coordinate)
     if position.top then
       return self:_evaluateNumber(position.top, "y")
     elseif position.bottom then
-      local parentWidth, parentHeight = self.parent:getSize()
-      local width, height = self:getSize()
+      local parentWidth, parentHeight = self.parent:getInnerSize()
+      local width, height = self:getInnerSize()
       local bottom = self:_evaluateNumber(position.bottom, "y")
 
       return parentHeight - height - bottom
@@ -238,7 +238,7 @@ end
 --  @private
 function Object:_isMouseOnDraggingArea()
   -- Quit early if not hovering
-  if not self.hovered then
+  if not self.isHovered then
     return false
   end
 
@@ -295,10 +295,7 @@ end
 function Object:getInnerSize()
   local width, height = self:getSize()
 
-  local top, right, bottom, left = 0, 0, 0, 0
-  if self.parent then
-    top, right, bottom, left = self.parent:getPadding()
-  end
+  local top, right, bottom, left = self:getPadding()
 
   local paddingX = left + right
   local paddingY = top + bottom
@@ -314,6 +311,7 @@ function Object:getPadding()
   local right = self:_evaluateNumber(self.padding.right, "x", true)
   local bottom = self:_evaluateNumber(self.padding.bottom, "y", true)
   local left = self:_evaluateNumber(self.padding.left, "x", true)
+
   return top, right, bottom, left
 end
 

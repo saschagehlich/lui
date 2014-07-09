@@ -8,8 +8,8 @@ function love.load()
   gui = lui()
 
   local window = gui:createWindow("Window title")
-  window:setPosition("10%", "10%")
-  window:setSize("80%", "80%")
+  window:setPosition({ bottom = "10%", left = 0 })
+  window:setSize(300, 250)
   window:show()
 
   local button = gui:createButton("OK")

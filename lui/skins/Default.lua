@@ -47,7 +47,7 @@ end
 --  @param {Button} button
 function DefaultSkin:drawButton(button)
   local x, y = button:getPosition()
-  local width, height = button:getInnerSize()
+  local width, height = button:getSize()
 
   local color = self.buttonBackgroundColor
   local lightingInset = false

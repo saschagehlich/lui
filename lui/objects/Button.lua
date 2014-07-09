@@ -12,7 +12,7 @@ function Button:initialize(lui, text)
   Object.initialize(self, lui)
 
   self.text = text
-  self.size = { width = 100, height = 50 }
+  self.size = { width = 100, height = 30 }
   self.showPointer = true
 
   self.isToggleable = false

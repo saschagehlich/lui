@@ -10,6 +10,8 @@ local Panel = class("Panel", Object)
 --  @param {String} text
 function Panel:initialize(lui)
   Object.initialize(self, lui)
+
+  self.size = { width = 100, height = 100 }
 end
 
 --- Draws the Panel

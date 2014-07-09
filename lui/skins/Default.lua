@@ -8,7 +8,7 @@ local DefaultSkin = class("DefaultSkin")
 
 -- Colors
 DefaultSkin.windowBackgroundColor = { 112, 131, 125 }
-DefaultSkin.panelBackgroundColor = { 159, 183, 111 }
+DefaultSkin.panelBackgroundColor = { 159, 183, 111, 128 }
 -- DefaultSkin.panelBackgroundColor = { 255, 0, 0, 128 }
 DefaultSkin.buttonBackgroundColor = { 112, 131, 125 }
 DefaultSkin.buttonPressedBackgroundColor = { 159, 175, 175 }
@@ -123,6 +123,7 @@ end
 --  @param {Number} width
 --  @param {Number} height
 function DefaultSkin:drawLighting(inset, x, y, width, height)
+
   local points
   if inset == true then
     points = {

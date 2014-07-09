@@ -115,155 +115,11 @@ function Object:_evaluateNumber(value, coordinate, ownSize)
     if string.find(value, "%%") then
       -- Percentage
       value = string.gsub(value, "%%", "") -- remove %
-      return Util.round(baseValue / 100 * value)
-    elseif value == "max" then
-      -- Max size
-      local maxValue
-      if coordinate == "x" then
-        maxValue = self:_getMaxWidth()
-      elseif coordinate == "y" then
-        maxValue = self:_getMaxHeight()
-      end
-
-      return maxValue
+      return math.floor(baseValue / 100 * value)
     end
   else
     return value
   end
-end
-
---- Finds the maximum width of this object, based on its parent's size
---  and the other objects in its parent
---  @returns {Number}
-function Object:_getMaxWidth()
-  local positionValues = self.position
-  local parentWidth, parentHeight = self.parent:getInnerSize()
-
-  local y = self:getY()
-  local height = self:getHeight()
-
-  local maxWidth
-  if positionValues.left then
-    local x = self:_evaluateNumber(positionValues.left, "x")
-
-    -- Default: Parent's right border
-    maxWidth = parentWidth - x
-
-    -- Iterate over all parent's objects, check for their x position
-    self.parent:eachChild(function (object)
-      if object == self then return end
-
-      local objectX, objectY = object:getRelativePosition()
-      local objectHeight = object:getHeight()
-
-      -- If they don't intersect on the Y axis, gtfo.
-      if objectY + objectHeight < y or objectY > y + height then
-        return
-      end
-
-      if objectX <= x then return end
-      local objectWidth = object:getWidth()
-      if objectX + objectWidth <= x then return end
-
-      local widthUntilObject = objectX - x
-
-      maxWidth = math.min(maxWidth, widthUntilObject)
-    end)
-  elseif positionValues.right then
-    -- Default: Parent's left border
-    local right = self:_evaluateNumber(positionValues.right, "x")
-    maxWidth = parentWidth - right
-
-    -- Iterate over all parent's objects, check for their x position
-    self.parent:eachChild(function (object)
-      if object == self then return end
-
-      local objectX, objectY = object:getRelativePosition()
-      local objectHeight = object:getHeight()
-
-      -- If they don't intersect on the Y axis, gtfo.
-      if objectY + objectHeight < y or objectY > y + height then
-        return
-      end
-
-      if objectX >= parentWidth - right then return end
-      local objectWidth = object:getWidth()
-
-      local widthUntilObject = parentWidth - (objectX + objectWidth) - right
-
-      maxWidth = math.min(maxWidth, widthUntilObject)
-    end)
-  end
-
-  return maxWidth
-end
-
---- Finds the maximum height of this object, based on its parent's size
---  and the other objects in its parent
---  @returns {Number}
-function Object:_getMaxHeight()
-  local positionValues = self.position
-  local parentWidth, parentHeight = self.parent:getInnerSize()
-  local maxHeight
-
-  local x = 0
-  local width = 0
-  local x = self:getX()
-  local width = self:getWidth()
-
-  if positionValues.top then
-    local y = self:_evaluateNumber(positionValues.top, "y")
-
-    -- Default: Parent's right border
-    maxHeight = parentHeight - y
-
-    -- Iterate over all parent's objects, check for their x position
-    self.parent:eachChild(function (object)
-      if object == self then return end
-
-      local objectX, objectY = object:getRelativePosition()
-      local objectWidth = object:getWidth()
-
-      -- If they don't intersect on the X axis, gtfo.
-      if objectX + objectWidth < x or objectX > x + width then
-        return
-      end
-
-      if objectY <= y then return end
-      local height = object:getHeight()
-      if objectY + height <= y then return end
-
-      local heightUntilObject = objectY - y
-
-      maxHeight = math.min(maxHeight, heightUntilObject)
-    end)
-  elseif positionValues.bottom then
-    -- Default: Parent's left border
-    local bottom = self:_evaluateNumber(positionValues.bottom, "y")
-    maxHeight = parentHeight - bottom
-
-    -- Iterate over all parent's objects, check for their x position
-    self.parent:eachChild(function (object)
-      if object == self then return end
-
-      local objectX, objectY = object:getRelativePosition()
-      local objectWidth = object:getWidth()
-
-      -- If they don't intersect on the X axis, gtfo.
-      if objectX + objectWidth < x or objectX > x + width then
-        return
-      end
-
-      if objectY >= bottom then return end
-      local objectHeight = object:getWidth()
-
-      local heightUntilObject = parentHeight - (objectY + objectHeight) - bottom
-
-      maxHeight = math.min(maxHeight, heightUntilObject)
-    end)
-  end
-
-  return maxHeight
 end
 
 --- Returns the x or y position for the given positions table
@@ -516,22 +372,6 @@ function Object:getY()
   return y
 end
 
---- Gets the relative position
---  @returns {Number, Number}
---  @public
-function Object:getRelativePosition()
-  local x, y = self:getPosition()
-  local parentX, parentY = self.parent:getPosition()
-
-  if self.positionMode ~= "absolute" then
-    local top, right, bottom, left = self.parent:getPadding()
-    x = x - left
-    y = y - top
-  end
-
-  return x - parentX, y - parentY
-end
-
 --- Gets the position by the currently set `center` object / position
 --  @returns {Number, Number}
 --  @public
@@ -557,7 +397,7 @@ function Object:getCenterPosition()
   local x, y = self:getPosition()
   local width, height = self:getSize()
 
-  return Util.round(x + width / 2), Util.round(y + height / 2)
+  return math.floor(x + width / 2), math.floor(y + height / 2)
 end
 
 --- Gets the drawing size

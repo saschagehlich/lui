@@ -53,7 +53,7 @@ function DefaultSkin:drawButton(button)
   local lightingInset = false
   if button.isPressed or button.isToggled then
     color = self.buttonPressedBackgroundColor
-    lightingInset = true
+    -- lightingInset = true
   end
 
   love.graphics.setColor(color)
@@ -105,29 +105,39 @@ end
 --  @param {Number} width
 --  @param {Number} height
 function DefaultSkin:drawLighting(inset, x, y, width, height)
-  -- Draw top left
-  local points = {
-    x, y + height,
-    x, y,
-    x + width + 1, y
-  }
+  local points
   if inset == true then
+    points = {
+      x, y + height + 1,
+      x, y - 1,
+      x + width + 1, y
+    }
     love.graphics.setColor(self.shadowColor)
   else
+    points = {
+      x + 1, y + height,
+      x, y,
+      x + width, y
+    }
     love.graphics.setColor(self.lightColor)
   end
   love.graphics.setLineStyle("rough")
   love.graphics.line(points)
 
   -- Draw bottom right
-  local points = {
-    x + width + 1, y,
-    x + width + 1, y + height,
-    x, y + height
-  }
   if inset == true then
+    points = {
+      x + width + 1, y,
+      x + width + 1, y + height,
+      x, y + height
+    }
     love.graphics.setColor(self.lightColor)
   else
+    points = {
+      x + width, y + 1,
+      x + width, y + height - 1,
+      x + 1, y + height - 1
+    }
     love.graphics.setColor(self.shadowColor)
   end
   love.graphics.setLineStyle("rough")

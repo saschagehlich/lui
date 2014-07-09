@@ -11,7 +11,7 @@ function love.load()
   window:setSize(300, 250)
   window:show()
   window:setLockedTo(gui.root)
-  window:setCenter()
+  -- window:setCenter()
 
   local button = gui:createButton("OK")
   button:setPosition({ bottom = 0, right = 0 })

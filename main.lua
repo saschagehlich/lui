@@ -13,7 +13,10 @@ function love.load()
   window:show()
 
   local button = gui:createButton("Button caption")
-  button:setPosition(0, 0)
+  button:setPosition({
+    bottom = 0,
+    left = 0
+  })
   window:addChild(button)
 end
 

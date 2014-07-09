@@ -27,7 +27,7 @@ function Object:initialize(lui)
   self.isHovering = false
 
   self.size = { width = 0, height = 0 }
-  self.position = { x = 0, y = 0 }
+  self.position = { top = 0, left = 0 }
   self.padding = {
     top = 0,
     left = 0,
@@ -66,12 +66,12 @@ end
 --  whether the pixel values should be calculated based on
 --  its own size (true) or the parent's size (false)
 --  @param {String|Number} value
---  @param {Number} direction
+--  @param {String} coordinate
 --  @param {Boolean} ownSize
 --  @returns {Number}
 --  @private
-function Object:_evaluateNumber(value, direction, ownSize)
-  assert(direction, "Object:_evaluateNumber needs a direction")
+function Object:_evaluateNumber(value, coordinate, ownSize)
+  assert(coordinate, "Object:_evaluateNumber needs a coordinate")
 
   local baseObject = self.parent
   if ownSize then
@@ -87,15 +87,44 @@ function Object:_evaluateNumber(value, direction, ownSize)
     value = string.gsub(value, "%%", "")
 
     -- Get parent size
-    if direction == "x" then
+    if coordinate == "x" then
       local width = baseWidth
       return width / 100 * value
-    elseif direction == "y" then
+    elseif coordinate == "y" then
       local height = baseHeight
       return height / 100 * value
     end
   else
     return value
+  end
+end
+
+--- Returns the x or y position for the given positions table
+--  @param {Table} positions
+--  @param {String} coordinate
+--  @returns {Number}
+--  @private
+function Object:_evaluatePosition(position, coordinate)
+  if coordinate == "x" then
+    if position.left then
+      return self:_evaluateNumber(position.left, "x")
+    elseif position.right then
+      local parentWidth, parentHeight = self.parent:getSize()
+      local width, height = self:getSize()
+      local right = self:_evaluateNumber(position.right, "x")
+
+      return parentWidth - width - right
+    end
+  else
+    if position.top then
+      return self:_evaluateNumber(position.top, "y")
+    elseif position.bottom then
+      local parentWidth, parentHeight = self.parent:getSize()
+      local width, height = self:getSize()
+      local bottom = self:_evaluateNumber(position.bottom, "y")
+
+      return parentHeight - height - bottom
+    end
   end
 end
 
@@ -214,8 +243,8 @@ end
 --  @returns {Number, Number}
 --  @public
 function Object:getPosition()
-  local x = self:_evaluateNumber(self.position.x, "x")
-  local y = self:_evaluateNumber(self.position.y, "y")
+  local x = self:_evaluatePosition(self.position, "x")
+  local y = self:_evaluatePosition(self.position, "y")
 
   if self.parent then
     -- Add parent offset
@@ -303,12 +332,29 @@ function Object:hide()
 end
 
 --- Sets the position
---  @param {Number|String} x
---  @param {Number|String} y
+--  Object:setPosition(x, y)
+--    @param {Number|String} x
+--    @param {Number|String} y
+--  Object:setPosition(positions)
+--    @param {Table} positions
 --  @public
 function Object:setPosition(x, y)
-  if x ~= nil then self.position.x = x end
-  if y ~= nil then self.position.y = y end
+  if type(x) == "table" then
+    assert(
+      not (self.position.left and self.position.right),
+      "setPosition: `left` and `right` must not be set at the same time."
+    )
+    assert(
+      not (self.position.top and self.position.bottom),
+      "setPosition: `top` and `bottom` must not be set at the same time."
+    )
+    self.position = x
+  else
+    self.position = {
+      left = x,
+      top = y
+    }
+  end
 end
 
 --- Sets the size

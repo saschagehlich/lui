@@ -1,5 +1,6 @@
 local pathMatch = "(.+)%.objects.Object$"
 local class = require((...):match(pathMatch) .. ".lib.middleclass")
+local calc = require((...):match(pathMatch) .. ".lib.calc")
 local Util = require((...):match(pathMatch) .. ".lib.Util")
 local EventEmitter = require((...):match(pathMatch) .. ".lib.EventEmitter")
 
@@ -112,11 +113,32 @@ function Object:_evaluateNumber(value, coordinate, ownSize)
       baseValue = baseHeight
     end
 
-    if string.find(value, "%%") then
-      -- Percentage
-      value = string.gsub(value, "%%", "") -- remove %
-      return math.floor(baseValue / 100 * value)
+    for percentage in value:gmatch("%d+%%") do
+      local num = percentage:match("(%d+)")
+      local newNum = math.floor(baseValue / 100 * num)
+      value = value:gsub("%d+%%", newNum)
     end
+
+    for variable in value:gmatch("%a+") do
+      local name = variable:match("%a+")
+      local num = 0
+
+      if name == "y" then
+        num = self:getY(true)
+      elseif name == "x" then
+        num = self:getX(true)
+      elseif name == "width" then
+        num = self:getWidth()
+      elseif name == "height" then
+        num = self:getHeight()
+      else
+        error("Unknown variable in formula: " .. name)
+      end
+
+      value = value:gsub(name, num)
+    end
+
+    return calc(value)
   else
     return value
   end
@@ -306,19 +328,21 @@ end
 ]]--
 
 --- Gets the drawing position (considering offset etc.)
+--  @param {Boolean} relative
 --  @returns {Number, Number}
 --  @public
-function Object:getPosition()
-  return self:getX(), self:getY()
+function Object:getPosition(relative)
+  return self:getX(relative), self:getY(relative)
 end
 
 --- Gets the X position of this object
+--  @param {Boolean} relative
 --  @returns {Number}
 --  @public
-function Object:getX()
+function Object:getX(relative)
   local x = self:_evaluatePosition(self.position, "x")
 
-  if self.parent then
+  if self.parent and not relative then
     -- Add parent offset
     local parentX, parentY = self.parent:getPosition()
     x = x + parentX
@@ -342,12 +366,13 @@ function Object:getX()
 end
 
 --- Gets the Y position of this object
+--  @param {Boolean} relative
 --  @returns {Number}
 --  @public
-function Object:getY()
+function Object:getY(relative)
   local y = self:_evaluatePosition(self.position, "y")
 
-  if self.parent then
+  if self.parent and not relative then
     -- Add parent offset
     local parentX, parentY = self.parent:getPosition()
     y = y + parentY

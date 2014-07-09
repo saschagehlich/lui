@@ -12,6 +12,12 @@ function love.load()
   window:show()
   window:setLockedTo(gui.root)
   window:setCenter()
+
+  local panel = gui:createPanel()
+  panel:setPositionMode("absolute")
+  panel:setPosition(0, 60)
+  panel:setSize("100%", "100% - y")
+  window:addChild(panel)
 end
 
 function love.update(dt)

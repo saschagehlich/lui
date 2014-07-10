@@ -31,6 +31,7 @@ function Box:initialize(lui)
   self.centerFlags = { x = false, y = false }
   self.size = { width = 0, height = 0 }
   self.position = { top = 0, left = 0 }
+  self.offset = { x = 0, y = 0 }
   self.padding = {
     top = 0,
     left = 0,
@@ -234,6 +235,8 @@ function Box:getX(relative)
     x = centerX - width / 2
   end
 
+  x = x - self.offset.x
+
   return Util.round(x)
 end
 
@@ -265,6 +268,8 @@ function Box:getY(relative)
       y = centerY - height / 2
     end
   end
+
+  y = y - self.offset.y
 
   return Util.round(y)
 end
@@ -465,6 +470,15 @@ function Box:setInnerSize(width, height)
 
   local top, right, bottom, left = self:getPadding()
   self:setSize(width + left + right, height + top + bottom)
+end
+
+--- Sets the offset for this box
+--  @param {Number} x
+--  @param {Number} y
+--  @public
+function Box:setOffset(x, y)
+  self.offset.x = x
+  self.offset.y = y
 end
 
 --- Sets the padding

@@ -19,7 +19,7 @@ function ScrollBar:initialize(lui, type)
 
   self.contentSize = 0
   self.visibleSize = 0
-  self.scrollOffset = 0
+  self.scrollProgress = 0
 
   local buttonWidth = self.theme.scrollbarSize
   local buttonHeight = self.theme.scrollbarSize
@@ -67,10 +67,12 @@ function ScrollBar:initialize(lui, type)
   })
   self.scrollerButton:setDraggable(true)
   self.scrollArea:addChild(self.scrollerButton)
+
+  self.scrollerButton:on("drag", self._onScrollerDrag, self)
 end
 
 function ScrollBar:update(dt)
-  -- Set the scrollerButton height to represent the visible / content ratio
+  -- Let the scrollerButton size represent the visible / content ratio
   local ratio = self.visibleSize / self.contentSize
 
   if self.type == "vertical" then
@@ -89,6 +91,26 @@ function ScrollBar:draw()
   self.theme:drawScrollBar(self)
 
   Object.draw(self)
+end
+
+--- Gets called when the scroller button has been dragged. Updates
+--  the scrollProgress respectively.
+--  @param {Object} object
+--  @param {Number} x
+--  @param {Number} y
+--  @private
+function ScrollBar:_onScrollerDrag(object, x, y)
+  local freeAreaSize, objectPosition
+  if self.type == "vertical" then
+    freeAreaSize = self.scrollArea:getHeight() - self.scrollerButton:getHeight()
+    objectPosition = self.scrollerButton:getY(true)
+  else
+    freeAreaSize = self.scrollArea:getWidth() - self.scrollerButton:getWidth()
+    objectPosition = self.scrollerButton:getX(true)
+  end
+
+  self.scrollProgress = objectPosition / freeAreaSize
+  self:emit("scroll", self, self.scrollProgress)
 end
 
 --- Sets the visible size

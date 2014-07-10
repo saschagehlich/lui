@@ -75,10 +75,6 @@ function Draggable:_updateDragging()
   -- Calculate distance
   local distX, distY = x - startDragX, y - startDragY
 
-  if distX == 0 and distY == 0 then
-    return
-  end
-
   -- Add distance to current position
   local posX, posY = startX + distX, startY + distY
   local width, height = self:getSize()
@@ -102,6 +98,7 @@ function Draggable:_updateDragging()
 
   self:setPosition(posX, posY)
 
+  -- @TODO: only emit if really dragging
   self:emit("drag", self, distX, distY)
 end
 

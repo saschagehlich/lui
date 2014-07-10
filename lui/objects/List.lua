@@ -19,8 +19,12 @@ function List:initialize(lui)
   self.verticalScrollBar:setPositionMode("absolute")
   self.verticalScrollBar:setPosition({ right = 0, top = 0 })
   self.verticalScrollBar:setHeight("100%")
-
+  self.verticalScrollBar:on("scroll", self._onVerticalScroll, self)
   self:addChild(self.verticalScrollBar)
+
+  self.itemsGroup = self.lui:createGroup()
+  self.itemsGroup:setSize("100%", "100%")
+  self:addChild(self.itemsGroup)
 end
 
 function List:update(dt)
@@ -44,6 +48,18 @@ function List:draw()
   love.graphics.setStencil() -- unset stencil
 end
 
+--- Gets called when the scrollbar is scrolling
+--  @param {ScrollBar} object
+--  @param {Number} progress
+--  @private
+function List:_onVerticalScroll(object, progress)
+  local contentHeight = self.verticalScrollBar.contentSize
+  local visibleHeight = self.verticalScrollBar.visibleSize
+  local invisibleHeight = contentHeight - visibleHeight
+
+  self.itemsGroup.offset.y = invisibleHeight * progress
+end
+
 --- Override padding in case a scrollbar is visible
 --  @returns {Number, Number, Number, Number}
 --  @public
@@ -63,7 +79,8 @@ end
 function List:addItem(item)
   self.items[#self.items + 1] = item
   item:setIndex(#self.items)
-  self:addChild(item)
+  item:setList(self)
+  self.itemsGroup:addChild(item)
 
   self.verticalScrollBar:setContentSize(self:getContentHeight())
 end

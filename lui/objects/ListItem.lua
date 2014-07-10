@@ -11,6 +11,7 @@ function ListItem:initialize(lui)
   Object.initialize(self, lui)
 
   self.index = nil
+  self.list = nil
   self.size = { width = 100, height = 25 }
 end
 
@@ -18,7 +19,7 @@ end
 --  @returns {Number}
 --  @public
 function ListItem:getWidth()
-  if self.parent.type == "vertical" then
+  if self.list.type == "vertical" then
     self.size.width = "100%"
   end
   return Object.getWidth(self)
@@ -37,7 +38,7 @@ end
 function ListItem:getY()
   local defaultY = Object.getY(self)
 
-  local list = self.parent
+  local list = self.list
   if list.type == "vertical" then
     local y = 0
     list:eachItemBefore(self.index, function (item)
@@ -66,6 +67,13 @@ end
 --  @public
 function ListItem:setIndex(index)
   self.index = index
+end
+
+--- Sets the list
+--  @param {List} list
+--  @public
+function ListItem:setList(list)
+  self.list = list
 end
 
 return ListItem

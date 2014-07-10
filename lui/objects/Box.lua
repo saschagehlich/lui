@@ -3,7 +3,6 @@ local pathBase = (...):match(pathMatch)
 
 -- Dependencies
 local class = require(pathBase .. ".lib.middleclass")
-local calc = require(pathBase .. ".lib.calc")
 local Util = require(pathBase .. ".lib.Util")
 
 local Box = class("Box")
@@ -160,7 +159,7 @@ function Box:_evaluateNumber(value, coordinate, ownSize)
       value = value:gsub(name, num)
     end
 
-    return calc(value)
+    return loadstring("return " .. value)()
   else
     return value
   end

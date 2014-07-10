@@ -18,17 +18,17 @@ function love.load()
   local panel = gui:createPanel()
   panel:setPosition(0, 40)
   panel:setScheme("Gray")
-  panel:setSize("100%", "100% - y")
+  panel:setSize("100%", "100%")
   panel:setPadding(5, 5)
   window:addChild(panel)
 
   local list = gui:createList()
   list:setPosition(0, 40)
-  list:setSize("100%", "100% - y")
+  list:setSize("100%", "100%")
   list:setPadding(10)
   panel:addChild(list)
 
-  for i = 1, 20, 1 do
+  for i = 1, 100, 1 do
     local item = gui:createListItem()
 
     local text = gui:createText("Ohai " .. i)
@@ -46,6 +46,8 @@ end
 
 function love.draw()
   gui:draw()
+
+  love.graphics.print("FPS: " .. love.timer.getFPS(), 5, 5)
 end
 
 function love.keypressed(key)

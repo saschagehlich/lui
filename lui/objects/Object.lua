@@ -4,7 +4,6 @@ local pathBase = (...):match(pathMatch)
 -- Dependencies
 local Box = require(pathBase .. ".objects.Box")
 local class = require(pathBase .. ".lib.middleclass")
-local calc = require(pathBase .. ".lib.calc")
 local Util = require(pathBase .. ".lib.Util")
 
 -- Mixins

@@ -10,12 +10,16 @@ function Tooltippable:_init()
   self:on("blur", self._tooltipOnBlur, self)
 end
 
+--- Gets called when the object is hovered
+--  @private
 function Tooltippable:_tooltipOnHover()
   if self.tooltip then
     self.currentTooltipDelay = self.tooltipDelay
   end
 end
 
+--- Gets called when the object is no longer hovered
+--  @private
 function Tooltippable:_tooltipOnBlur()
   if self.tooltip then
     self.tooltip:hide()
@@ -23,6 +27,9 @@ function Tooltippable:_tooltipOnBlur()
   end
 end
 
+--- Updates the tooltip delay, follows the cursor if needed
+--  @param {Number} dt
+--  @private
 function Tooltippable:_updateTooltippable(dt)
   -- Tooltip delay
   if self.currentTooltipDelay ~= nil then
@@ -49,6 +56,36 @@ function Tooltippable:_updateTooltippable(dt)
       local distX, distY = self.tooltipDistance.x, self.tooltipDistance.y
       self.tooltip:setPosition(mouseX + distX, mouseY + distY)
   end
+end
+
+--- Sets the given object as the tooltip
+--  @param {Object} object
+--  @public
+function Tooltippable:setTooltip(object)
+  self.tooltip = object
+  self.tooltip:hide()
+end
+
+--- Specifies the delay after which the tooltip should be displayed
+--  @param {Number} delay
+--  @public
+function Tooltippable:setTooltipDelay(delay)
+  self.tooltipDelay = delay
+end
+
+--- Specifies whether or not the tooltip should follow the mouse position
+--  @param {Boolean} bool
+--  @public
+function Tooltippable:setTooltipFollowsMouse(bool)
+  self.tooltipFollowsMouse = bool
+end
+
+--- Specifies the distance between the cursor and the tooltip
+--  @param {Number} x
+--  @param {Number} y
+--  @public
+function Tooltippable:setTooltipDistance(x, y)
+  self.tooltipDistance = { x = x, y = y }
 end
 
 return Tooltippable

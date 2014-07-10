@@ -8,6 +8,7 @@ local Draggable = {}
 function Draggable:_init()
   self.isDraggable = false
   self.isDragging = false
+  self.lockedToObject = nil
 end
 
 function Draggable:_updateDraggable(dt)
@@ -107,6 +108,13 @@ function Draggable:_isMouseOnDraggingArea()
     height = self:_evaluateNumber(self.draggingArea.height, "y")
   }
   return Util.pointIntersectsWithRect(mousePosition, draggingArea)
+end
+
+--- Sets the object that this object is locked to. If this object is
+--  draggable, the user won't be able to drag it outside the given object.
+--  @param {Object} object
+function Draggable:setLockedTo(object)
+  self.lockedToObject = object
 end
 
 return Draggable

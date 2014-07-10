@@ -24,6 +24,10 @@ function Object:initialize(lui)
   -- `relative` = add padding to position
   self.positionMode = "relative"
 
+  self.tooltipDelay = 1
+  self.tooltipFollowsMouse = true
+  self.tooltipDistance = { x = 15, y = 15 }
+
   -- States
   self.isRemoved = false
   self.isVisible = true
@@ -62,6 +66,30 @@ function Object:update(dt)
   self:eachInternal(function (object)
     object:update(dt)
   end)
+
+  -- Tooltip delay
+  if self.currentTooltipDelay ~= nil then
+    self.currentTooltipDelay = self.currentTooltipDelay - dt
+    if self.currentTooltipDelay <= 0 then
+      self.tooltip:show()
+      self.tooltip:moveToTop()
+
+      local mouseX, mouseY = love.mouse.getPosition()
+      local distX, distY = self.tooltipDistance.x, self.tooltipDistance.y
+      self.tooltip:setPosition(mouseX + distX, mouseY + distY)
+
+      self.currentTooltipDelay = nil
+    end
+  end
+
+  -- Tooltip follow
+  if self.tooltip and
+    self.tooltip.isVisible and
+    self.tooltipFollowsMouse then
+      local mouseX, mouseY = love.mouse.getPosition()
+      local distX, distY = self.tooltipDistance.x, self.tooltipDistance.y
+      self.tooltip:setPosition(mouseX + distX, mouseY + distY)
+  end
 end
 
 --- Removes children flagged as removed
@@ -209,14 +237,33 @@ function Object:_handleHover()
       -- Update hovered state, emit `hover` event
       if not self.isHovered then
         self:emit("hover", self)
+        self:_onHover()
         self.isHovered = true
       end
   else
     -- Update hovered state, emit `blur` event
     if self.isHovered then
       self.isHovered = false
+      self:_onBlur()
       self:emit("blur", self)
     end
+  end
+end
+
+--- Gets called when hovering starts
+--  @public
+function Object:_onHover()
+  if self.tooltip then
+    self.currentTooltipDelay = self.tooltipDelay
+  end
+end
+
+--- Gets called when hovering has ended
+--  @public
+function Object:_onBlur()
+  if self.tooltip then
+    self.tooltip:hide()
+    self.currentTooltipDelay = nil
   end
 end
 
@@ -640,6 +687,20 @@ function Object:setSize(width, height)
   self.size.height = height
 end
 
+--- Sets the inner size (the given size + paddings)
+--  @param {Number} width
+--  @param {Number} height
+--  @public
+function Object:setInnerSize(width, height)
+  assert(
+    (type(width) == "number" and type(height) == "number"),
+    "Right now, arguments passed to Object:setInnerSize have to be numbers."
+  )
+
+  local top, right, bottom, left = self:getPadding()
+  self:setSize(width + left + right, height + top + bottom)
+end
+
 --- Sets the padding
 --  @param {Number|String} top
 --  @param {Number|String} right
@@ -690,7 +751,14 @@ function Object:remove()
     child:remove()
   end)
 
+  self:eachInternal(function (child)
+    child:remove()
+  end)
+
   self:emit("removed")
+  if self.tooltip then
+    self.tooltip:remove()
+  end
 end
 
 --- Sets the object that this object is locked to. If this object is
@@ -698,6 +766,57 @@ end
 --  @param {Object} object
 function Object:setLockedTo(object)
   self.lockedToObject = object
+end
+
+--- Sets the given object as the tooltip
+--  @param {Object} object
+--  @public
+function Object:setTooltip(object)
+  self.tooltip = object
+  self.tooltip:hide()
+end
+
+--- Specifies the delay after which the tooltip should be displayed
+--  @param {Number} delay
+--  @public
+function Object:setTooltipDelay(delay)
+  self.tooltipDelay = delay
+end
+
+--- Specifies whether or not the tooltip should follow the mouse position
+--  @param {Boolean} bool
+--  @public
+function Object:setTooltipFollowsMouse(bool)
+  self.tooltipFollowsMouse = bool
+end
+
+--- Specifies the distance between the cursor and the tooltip
+--  @param {Number} x
+--  @param {Number} y
+--  @public
+function Object:setTooltipDistance(x, y)
+  self.tooltipDistance = { x = x, y = y }
+end
+
+--- If no argument is given, this method moves itself up in the parent's
+--  children. If an object is given, it will be sorted up in this object's
+--  children
+--  @param {Object} [object]
+--  @public
+function Object:moveToTop(object)
+  if object then
+    table.sort(self.children, function (a, b)
+      if a == object then
+        return false
+      elseif b == object then
+        return true
+      else
+        return nil
+      end
+    end)
+  else
+    self.parent:moveToTop(self)
+  end
 end
 
 return Object

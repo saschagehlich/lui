@@ -7,7 +7,7 @@ local lui = class("lui")
 lui.availableObjects = {
   "Object", "Root", "Group",
 
-  "Window", "Panel",
+  "Window", "Panel", "Tooltip",
   "Button", "Text", "Image"
 }
 

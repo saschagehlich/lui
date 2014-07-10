@@ -11,14 +11,15 @@ local Tooltip = class("Tooltip", Object)
 function Tooltip:initialize(lui, text)
   Object.initialize(self, lui)
 
-  self.sizeDynamic = true
-  self.text = text or ""
-
+  self:setPadding(5, 10)
   self.textObject = self.lui:createText(self.text)
   self.textObject:setAlignment("center", "center")
   self:addChild(self.textObject)
 
-  self:setMaxWidth(150)
+  self:setText(text)
+
+  -- Automatically add to root
+  self.lui.root:addChild(self)
 end
 
 --- Draws the Tooltip
@@ -38,9 +39,7 @@ function Tooltip:setText(text)
   self.textObject:setText(text)
 
   local width, height = self.textObject:getSize()
-  self:setSize(width, height)
+  self:setInnerSize(width, height)
 end
-
-function Tooltip:setMaxWidth()
 
 return Tooltip

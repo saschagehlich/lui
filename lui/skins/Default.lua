@@ -8,7 +8,8 @@ local DefaultSkin = class("DefaultSkin")
 
 -- Colors
 DefaultSkin.windowBackgroundColor = { 112, 131, 125 }
-DefaultSkin.panelBackgroundColor = { 159, 183, 111, 128 }
+DefaultSkin.panelBackgroundColor = { 159, 183, 111 }
+DefaultSkin.tooltipBackgroundColor = { 159, 183, 111 }
 -- DefaultSkin.panelBackgroundColor = { 255, 0, 0, 128 }
 DefaultSkin.buttonBackgroundColor = { 112, 131, 125 }
 DefaultSkin.buttonPressedBackgroundColor = { 159, 175, 175 }
@@ -33,6 +34,20 @@ function DefaultSkin:initialize(lui)
   self.font = love.graphics.newFont(12)
   self.windowTitleFont = self.font
   self.buttonFont = self.font
+end
+
+--- Draws the given tooltip
+--  @param {Tooltip} tooltip
+function DefaultSkin:drawTooltip(tooltip)
+  local x, y = tooltip:getPosition()
+  local width, height = tooltip:getSize()
+
+  -- Draw background
+  love.graphics.setColor(self.tooltipBackgroundColor)
+  love.graphics.rectangle("fill", x, y, width, height)
+
+  -- Reset color
+  love.graphics.setColor(255, 255, 255)
 end
 
 --- Draws the given window

@@ -44,8 +44,8 @@ function Window:_createCloseButton()
   self.closeButton:setPosition({ right = 2, top = 2 })
   self.closeButton:on("click", self._onCloseClick, self)
 
-  -- local tooltip = self.lui:createTooltip("Close")
-  -- self.closeButton:setTooltip(tooltip)
+  local tooltip = self.lui:createTooltip("Close")
+  self.closeButton:setTooltip(tooltip)
 
   self:addInternal(self.closeButton)
 

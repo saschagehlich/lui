@@ -122,7 +122,7 @@ function Box:_evaluateNumber(value, coordinate, ownSize)
     baseObject = self
   end
 
-  if type(value) == "string" then
+  if type(value) == "table" then
     local ignorePadding = self.positionMode == "absolute"
     local baseWidth, baseHeight = baseObject:getInnerSize(ignorePadding)
 
@@ -134,32 +134,7 @@ function Box:_evaluateNumber(value, coordinate, ownSize)
       baseValue = baseHeight
     end
 
-    for percentage in value:gmatch("%d+%%") do
-      local num = percentage:match("(%d+)")
-      local newNum = math.floor(baseValue / 100 * num)
-      value = value:gsub("%d+%%", newNum)
-    end
-
-    for variable in value:gmatch("%a+") do
-      local name = variable:match("%a+")
-      local num = 0
-
-      if name == "y" then
-        num = self:getY(true)
-      elseif name == "x" then
-        num = self:getX(true)
-      elseif name == "width" then
-        num = self:getWidth()
-      elseif name == "height" then
-        num = self:getHeight()
-      else
-        error("Unknown variable in formula: " .. name)
-      end
-
-      value = value:gsub(name, num)
-    end
-
-    return loadstring("return " .. value)()
+    return baseValue / 100 * value.value
   else
     return value
   end
@@ -449,8 +424,8 @@ function Box:setPosition(x, y)
 end
 
 --- Sets the size
---  @param {Number|String} width
---  @param {Number|String} height
+--  @param {Number|Percent} width
+--  @param {Number|Percent} height
 --  @public
 function Box:setSize(width, height)
   self.size.width = width

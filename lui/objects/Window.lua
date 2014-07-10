@@ -23,7 +23,7 @@ function Window:initialize(lui, title)
   self.draggingArea = {
     x = 0,
     y = 0,
-    width = "100%",
+    width = lui.percent(100),
     height = self.theme.windowTitleBarHeight
   }
 

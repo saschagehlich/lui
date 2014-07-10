@@ -18,12 +18,12 @@ function List:initialize(lui)
   self.verticalScrollBar = lui:createScrollBar("vertical")
   self.verticalScrollBar:setPositionMode("absolute")
   self.verticalScrollBar:setPosition({ right = 0, top = 0 })
-  self.verticalScrollBar:setHeight("100%")
+  self.verticalScrollBar:setHeight(lui.percent(100))
   self.verticalScrollBar:on("scroll", self._onVerticalScroll, self)
   self:addChild(self.verticalScrollBar)
 
   self.itemsGroup = self.lui:createGroup()
-  self.itemsGroup:setSize("100%", "100%")
+  self.itemsGroup:setSize(lui.percent(100), lui.percent(100))
   self:addChild(self.itemsGroup)
 end
 

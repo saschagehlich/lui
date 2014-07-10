@@ -20,7 +20,7 @@ end
 --  @public
 function ListItem:getWidth()
   if self.list.type == "vertical" then
-    self.size.width = "100%"
+    self.size.width = self.lui.percent(100)
   end
   return Object.getWidth(self)
 end

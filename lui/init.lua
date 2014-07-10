@@ -20,6 +20,10 @@ lui.availableThemes = {
   Default = require(path .. ".themes.Default")
 }
 
+function lui.percent (value)
+  return { value = value, type = "percent" }
+end
+
 --- The main entry point / constructor
 --  @param {Table} config
 function lui:initialize(config)

@@ -25,9 +25,9 @@ function ScrollBar:initialize(lui, type)
   local buttonHeight = self.theme.scrollbarSize
 
   if self.type == "vertical" then
-    buttonWidth = "100%"
+    buttonWidth = lui.percent(100)
   else
-    buttonHeight = "100%"
+    buttonHeight = lui.percent(100)
   end
 
   -- The lower boundary button (scroll up or scroll left)
@@ -47,7 +47,7 @@ function ScrollBar:initialize(lui, type)
   local scrollAreaHeight = self:getHeight()
   self.scrollArea = self.lui:createGroup()
   if self.type == "vertical" then
-    self.scrollArea:setSize(scrollAreaWidth, "100% - " .. buttonHeight * 2)
+    self.scrollArea:setSize(scrollAreaWidth, lui.percent(100))
     self.scrollArea:setPosition(0, buttonHeight)
   else
     self.scrollArea:setPosition(buttonWidth, 0)
@@ -62,8 +62,8 @@ function ScrollBar:initialize(lui, type)
   self.scrollerButton:setDraggingArea({
     x = 0,
     y = 0,
-    width = "100%",
-    height = "100%"
+    width = lui.percent(100),
+    height = lui.percent(100)
   })
   self.scrollerButton:setDraggable(true)
   self.scrollArea:addChild(self.scrollerButton)

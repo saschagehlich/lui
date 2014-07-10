@@ -21,7 +21,7 @@ function Button:initialize(lui, text)
   self.isToggled = false
 
   self.textObject = self.lui:createText(self.text)
-  self.textObject:setSize("100%", "100%")
+  self.textObject:setSize(lui.percent(100), lui.percent(100))
   self.textObject:setAlignment("center", "center")
   self:addChild(self.textObject)
 

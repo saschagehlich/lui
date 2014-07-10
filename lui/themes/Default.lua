@@ -42,6 +42,22 @@ function DefaultTheme:drawTooltip(tooltip)
   love.graphics.setColor(255, 255, 255)
 end
 
+--- Draws the given list
+--  @param {List} list
+function DefaultTheme:drawList(list)
+  local x, y = list:getPosition()
+  local width, height = list:getSize()
+
+  -- Draw background
+  love.graphics.setColor(list.scheme.listBackgroundColor)
+  love.graphics.rectangle("fill", x, y, width, height)
+
+  self:drawLighting(true, x, y, width, height)
+
+  -- Reset color
+  love.graphics.setColor(255, 255, 255)
+end
+
 --- Draws the given window
 --  @param {Window} window
 function DefaultTheme:drawWindow(window)

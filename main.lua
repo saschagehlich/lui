@@ -8,20 +8,36 @@ function love.load()
   gui = lui()
 
   local window = gui:createWindow("Window title")
-  window:setSize("90%", "90%")
+  window:setSize(640, 480)
   window:show()
   window:setScheme("Red")
+  window:setPadding(40, 0, 0, 0)
   window:setLockedTo(gui.root)
   window:setCenter()
 
   local panel = gui:createPanel()
-  panel:setPosition(0, 60)
+  panel:setPosition(0, 40)
   panel:setScheme("Gray")
   panel:setSize("100%", "100% - y")
+  panel:setPadding(5, 5)
   window:addChild(panel)
 
-  local text = gui:createText("This is some random text which is kinda long yo.")
-  window:addChild(text)
+  local list = gui:createList()
+  list:setPosition(0, 40)
+  list:setSize("100%", "100% - y")
+  list:setPadding(10)
+  panel:addChild(list)
+
+  for i = 1, 20, 1 do
+    local item = gui:createListItem()
+
+    local text = gui:createText("Ohai " .. i)
+    text:setAlignment("center", "center")
+    text:setSize("100%", "100%")
+
+    item:addChild(text)
+    list:addItem(item)
+  end
 end
 
 function love.update(dt)

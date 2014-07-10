@@ -474,17 +474,24 @@ end
 --  @param {Number|String} left (optional)
 --  @public
 function Box:setPadding(top, right, bottom, left)
-  if bottom == nil and left == nil then
+  print(top, right, bottom, left)
+  if top ~= nil and right ~= nil and bottom ~= nil and left ~= nil then
+    self.padding.top = top
+    self.padding.right = right
+    self.padding.bottom = bottom
+    self.padding.left = left
+  elseif top ~= nil and right ~= nil then
     local vertical, horizontal = top, right
     self.padding.top = vertical
     self.padding.right = horizontal
     self.padding.bottom = vertical
     self.padding.left = horizontal
-  else
-    self.padding.top = top
-    self.padding.right = right
-    self.padding.bottom = bottom
-    self.padding.left = left
+  elseif top ~= nil then
+    local padding = top
+    self.padding.top = padding
+    self.padding.right = padding
+    self.padding.bottom = padding
+    self.padding.left = padding
   end
 end
 

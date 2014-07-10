@@ -12,6 +12,9 @@ local Gray = {
   -- Tooltip
   tooltipBackgroundColor = { 131, 151, 151 },
 
+  -- List
+  listBackgroundColor = { 0, 0, 0, 50 },
+
   -- Button
   buttonBackgroundColor = { 131, 151, 151 },
   buttonToggledBackgroundColor = { 91, 115, 115 },

@@ -7,7 +7,6 @@ local Group = class("Group", Object)
 
 --- `Group` constructor
 --  @param {lui} lui
---  @param {String} text
 function Group:initialize(lui)
   Object.initialize(self, lui)
 end

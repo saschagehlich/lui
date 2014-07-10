@@ -12,6 +12,9 @@ local Red = {
   -- Tooltip
   tooltipBackgroundColor = { 179, 79, 79 },
 
+  -- List
+  listBackgroundColor = { 0, 0, 0, 50 },
+
   -- Button
   buttonBackgroundColor = { 179, 79, 79 },
   buttonToggledBackgroundColor = { 95, 7, 7 },

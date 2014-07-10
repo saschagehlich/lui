@@ -24,6 +24,7 @@ function Box:initialize(lui)
 
   -- States
   self.isVisible = true
+  self.isRemoved = false
 
   -- Defaults
   self.center = nil
@@ -91,6 +92,8 @@ end
 --- Update method
 --  @param {Number} dt
 function Box:update(dt)
+  self:_removeDeadChildren() -- :(
+
   -- Update children
   self:eachChild(function (object)
     object:update(dt)

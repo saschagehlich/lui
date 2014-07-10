@@ -27,9 +27,6 @@ Object:include(Tooltippable)
 function Object:initialize(lui)
   Box.initialize(self, lui)
 
-  -- States
-  self.isRemoved = false
-
   EventEmitter._init(self)
   Hoverable._init(self)
   Clickable._init(self)
@@ -42,8 +39,6 @@ end
 function Object:update(dt)
   -- Don't update if invisible!
   if not self.isVisible then return end
-
-  self:_removeDeadChildren() -- :(
 
   self:_updateHoverable(dt)
   self:_updateClickable(dt)
@@ -68,6 +63,5 @@ function Object:draw()
     object:draw()
   end)
 end
-
 
 return Object

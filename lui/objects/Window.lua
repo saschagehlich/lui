@@ -62,7 +62,7 @@ function Window:_createCloseButton()
   self:addInternal(self.closeButton)
 
   local basePathSlashes = basePath:gsub("%.", "/")
-  self.closeImage = self.lui:createImage(basePathSlashes .. "/objects/window/close.png")
+  self.closeImage = self.lui:createImage(self.lui:getThemePath(self.theme) .. "/window/close.png")
   self.closeButton:addChild(self.closeImage)
 
   self.closeImage:setCenter()

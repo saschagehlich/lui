@@ -5,6 +5,7 @@ local class = require(basePath .. ".lib.middleclass")
 local Object = require(basePath .. ".objects.Object")
 
 local DefaultTheme = class("DefaultTheme")
+DefaultTheme.pathName = "Default"
 
 -- Generic
 DefaultTheme.lightColor = { 255, 255, 255, 80 }

@@ -193,4 +193,12 @@ function lui:mousepressed(x, y, button)
   self:emit("mousepressed", x, y, button)
 end
 
+--- Returns the path for the given theme
+--  @param {String} themeName
+--  @returns {String}
+--  @public
+function lui:getThemePath(themeName)
+  return path .. "/themes/" .. themeName.pathName
+end
+
 return lui

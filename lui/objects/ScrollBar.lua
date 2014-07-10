@@ -20,7 +20,7 @@ function ScrollBar:initialize(lui, type)
   self.contentSize = 0
   self.visibleSize = 0
   self.scrollProgress = 0
-  self.distancePerScroll = 20
+  self.distancePerScroll = 25
 
   local buttonWidth = self.theme.scrollbarSize
   local buttonHeight = self.theme.scrollbarSize
@@ -35,12 +35,16 @@ function ScrollBar:initialize(lui, type)
   self.lowerButton = self.lui:createButton()
   self.lowerButton:setSize(buttonWidth, buttonHeight)
   self.lowerButton:setPosition({ top = 0, left = 0 })
+  self.lowerButton:setRepeat(0.5, 0.1)
+  self.lowerButton:on("mousepressed repeat", self._onLowerButtonClick, self)
   self:addInternal(self.lowerButton)
 
   -- The upper boundary button (scroll down or scroll right)
   self.upperButton = self.lui:createButton()
   self.upperButton:setSize(buttonWidth, buttonHeight)
   self.upperButton:setPosition({ bottom = 0, right = 0 })
+  self.upperButton:setRepeat(0.5, 0.1)
+  self.upperButton:on("mousepressed repeat", self._onUpperButtonClick, self)
   self:addInternal(self.upperButton)
 
   -- The area where the scroll button will be in
@@ -94,7 +98,7 @@ function ScrollBar:update(dt)
     self.scrollerButton:setWidth(scrollAreaWidth * ratio)
   end
 
-  Object.update(self)
+  Object.update(self, dt)
 end
 
 --- Draws the scroll bar
@@ -102,6 +106,20 @@ function ScrollBar:draw()
   self.theme:drawScrollBar(self)
 
   Object.draw(self)
+end
+
+--- Gets called when the user clicks on the "lower" button (left / top)
+--  @param {Object} object
+--  @private
+function ScrollBar:_onLowerButtonClick(object)
+  self:scrollUp()
+end
+
+--- Gets called when the user clicks on the "upper" button (right / bottom)
+--  @param {Object} object
+--  @private
+function ScrollBar:_onUpperButtonClick(object)
+  self:scrollDown()
 end
 
 --- Gets called when the scroller button has been dragged. Updates

@@ -20,6 +20,11 @@ function Button:initialize(lui, text)
   self.isToggleable = false
   self.isToggled = false
 
+  self.repeatClick = false
+  self.repeatDelay = 1
+  self.repeatInterval = 0.1
+  self.repeatCooldown = nil
+
   self.textObject = self.lui:createText(self.text)
   self.textObject:setSize(lui.percent(100), lui.percent(100))
   self.textObject:setAlignment("center", "center")
@@ -28,6 +33,7 @@ function Button:initialize(lui, text)
   self:on("hover", self.onHover, self)
   self:on("blur", self.onBlur, self)
   self:on("click", self.onClick, self)
+  self:on("mousepressed", self.onMousePressed, self)
 end
 
 --- Gets called when the mouse is hovering above the button
@@ -55,6 +61,31 @@ function Button:onClick()
     self.isToggled = not self.isToggled
     self:emit("toggle", self.isToggled)
   end
+end
+
+--- Gets called when the user is pressing the mouse button on this object
+--  @public
+function Button:onMousePressed()
+  self.pressedAt = os.clock()
+  self.repeatCooldown = self.repeatInterval
+end
+
+--- Handles repeating
+function Button:update(dt)
+
+  if self.repeatClick and
+    self.isPressed and
+    os.clock() - self.pressedAt >= self.repeatDelay then
+      self.repeatCooldown = self.repeatCooldown - dt
+
+      if self.repeatCooldown <= 0 then
+        self.repeatCooldown = self.repeatInterval - self.repeatCooldown
+
+        self:emit("repeat")
+      end
+  end
+
+  Object.update(self, dt)
 end
 
 --- Draws the Button
@@ -86,6 +117,22 @@ end
 function Button:setText(text)
   self.text = text
   self.textObject:setText(text)
+end
+
+--- Specifies whether the button should automatically repeat clicking
+--  if the user is holding it down.
+--  @param {Number} delay
+--  @param {Number} interval
+--  @public
+function Button:setRepeat(delay, interval)
+  if delay == false or delay == nil then
+    self.repeatClick = false
+    return
+  end
+
+  self.repeatClick = true
+  self.repeatDelay = delay
+  self.repeatInterval = interval
 end
 
 return Button

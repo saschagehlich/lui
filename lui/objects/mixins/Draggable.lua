@@ -8,7 +8,7 @@ local Draggable = {}
 function Draggable:_init()
   self.isDraggable = false
   self.isDragging = false
-  self.lockedToObject = nil
+  self.lockedToParent = false
 end
 
 function Draggable:_updateDraggable(dt)
@@ -26,25 +26,30 @@ function Draggable:_handleDragging()
   -- Handle dragging state
   local mouseDown = love.mouse.isDown("l")
   local mouseOnDraggingArea = self:_isMouseOnDraggingArea()
-  if mouseDown and not self.isDragging and mouseOnDraggingArea then
-    -- Not dragging but mouse is down, start dragging
-    local x, y = love.mouse.getPosition()
+  if mouseDown and
+    not self.lui.isDragging and
+    not self.isDragging and
+    mouseOnDraggingArea then
+      -- Not dragging but mouse is down, start dragging
+      local x, y = love.mouse.getPosition()
 
-    self.startDragPosition = {
-      x = x,
-      y = y
-    }
+      self.startDragPosition = {
+        x = x,
+        y = y
+      }
 
-    local startX, startY = self:getPosition()
-    self.startPosition = {
-      x = startX,
-      y = startY
-    }
+      local startX, startY = self:getPosition(true)
+      self.startPosition = {
+        x = startX,
+        y = startY
+      }
 
-    self.isDragging = true
+      self.isDragging = true
+      self:emit("dragstart")
   elseif not mouseDown and self.isDragging then
     -- Mouse is not down but dragging still active, stop dragging
     self.isDragging = false
+    self:emit("dragend")
   elseif mouseDown and self.isDragging then
     -- Dragging
     self:_updateDragging()
@@ -76,14 +81,13 @@ function Draggable:_updateDragging()
 
   -- If this object is locked to another object, make sure we can't drag
   -- it outside
-  if self.lockedToObject then
-    local lockedX, lockedY = self.lockedToObject:getPosition()
-    local lockedWidth, lockedHeight = self.lockedToObject:getSize()
+  if self.lockedToParent then
+    local parentWidth, parentHeight = self.parent:getSize()
 
-    posX = math.max(lockedX, posX) -- left boundary
-    posX = math.min(posX, lockedX + lockedWidth - width) -- right boundary
-    posY = math.max(lockedY, posY) -- top boundary
-    posY = math.min(posY, lockedY + lockedHeight - height) -- bottom boundary
+    posX = math.max(0, posX) -- left boundary
+    posX = math.min(posX, parentWidth - width) -- right boundary
+    posY = math.max(0, posY) -- top boundary
+    posY = math.min(posY, parentHeight - height) -- bottom boundary
   end
 
   self:setPosition(posX, posY)
@@ -110,11 +114,27 @@ function Draggable:_isMouseOnDraggingArea()
   return Util.pointIntersectsWithRect(mousePosition, draggingArea)
 end
 
---- Sets the object that this object is locked to. If this object is
---  draggable, the user won't be able to drag it outside the given object.
---  @param {Object} object
-function Draggable:setLockedTo(object)
-  self.lockedToObject = object
+--- Specifies whether the object should be locked to its parent (so
+--  that it can't be dragged outside of it)
+--  @param {Boolean} bool
+--  @public
+function Draggable:setLockedToParent(bool)
+  self.lockedToParent = bool
+end
+
+--- Sets the objects dragging area
+--  @param {Table} draggingArea
+--  @public
+function Draggable:setDraggingArea(draggingArea)
+  self.draggingArea = draggingArea
+end
+
+--- Sets the object to be draggable
+--  @param {Boolean} draggable
+--  @public
+function Draggable:setDraggable(draggable)
+  assert(self.draggingArea, "Object set as draggable, but not draggingArea set.")
+  self.isDraggable = draggable
 end
 
 return Draggable

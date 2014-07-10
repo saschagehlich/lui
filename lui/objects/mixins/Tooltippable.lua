@@ -35,8 +35,6 @@ function Tooltippable:_updateTooltippable(dt)
   if self.currentTooltipDelay ~= nil then
     self.currentTooltipDelay = self.currentTooltipDelay - dt
     if self.currentTooltipDelay <= 0 then
-
-      print(self.currentTooltipDelay)
       self.tooltip:show()
       self.tooltip:moveToTop()
 

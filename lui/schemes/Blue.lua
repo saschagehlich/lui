@@ -15,6 +15,9 @@ local Blue = {
   -- List
   listBackgroundColor = { 0, 0, 0, 50 },
 
+  -- ScrollBar
+  scrollBarBackgroundColor = { 0, 0, 0, 50 },
+
   -- Button
   buttonBackgroundColor = { 112, 131, 125 },
   buttonToggledBackgroundColor = { 159, 175, 175 },

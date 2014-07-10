@@ -7,7 +7,7 @@ lui.availableObjects = {
   "Object", "Root", "Group",
   "Window", "Panel", "Tooltip",
   "Button", "Text", "Image",
-  "List", "ListItem"
+  "List", "ListItem", "ScrollBar"
 }
 
 lui.availableSchemes = {
@@ -28,6 +28,8 @@ function lui:initialize(config)
 
   -- States
   self.isHovered = false
+  self.isDragging = false
+  self.isPressed = false
 
   self:_buildCreators()
 
@@ -68,6 +70,10 @@ end
 --  @private
 function lui:_onNewObject(object)
   object:on("hover blur", self._updateHoverState, self)
+  object:on("dragstart", self._onDragStart, self)
+  object:on("dragend", self._onDragEnd, self)
+  object:on("mousepressed", self._onMousePressed, self)
+  object:on("mousereleased", self._onMouseReleased, self)
 end
 
 --- Iterates over all objects, checks for hovered state
@@ -81,6 +87,31 @@ function lui:_updateHoverState()
       self.isHovered = object.isHovered
     end
   end, true)
+end
+
+--- Gets called when the user drags an object
+--  @private
+function lui:_onDragStart()
+  self.isDragging = true
+end
+
+--- Gets called when the user is no longer dragging an object
+--  @private
+function lui:_onDragEnd()
+  self.isDragging = false
+end
+
+--- Gets called when the user pressed the mouse button on an object
+--  @private
+function lui:_onMousePressed()
+  self.isPressed = true
+end
+
+--- Gets called when the user is no longer pressing the mouse button on
+--  an object
+--  @private
+function lui:_onMouseReleased()
+  self.isPressed = false
 end
 
 --- Sets the cursor, remembers the object that changed it

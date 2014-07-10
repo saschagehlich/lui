@@ -14,6 +14,14 @@ function List:initialize(lui)
   self.type = "vertical"
   self.items = {}
   self.spacing = { x = 10, y = 10 }
+
+  self.verticalScrollBar = lui:createScrollBar("vertical")
+  self.verticalScrollBar:setPositionMode("absolute")
+  self.verticalScrollBar:setPosition({ right = 0, top = 0 })
+  self.verticalScrollBar:setHeight("100%")
+  self.verticalScrollBar:setVisibleSize(self:getHeight())
+
+  self:addChild(self.verticalScrollBar)
 end
 
 --- Draws the list
@@ -24,11 +32,24 @@ function List:draw()
   local width, height = self:getSize()
 
   -- Draw children
-  love.graphics.setStencil(function ()
-    love.graphics.rectangle("fill", x, y, width, height)
-  end)
+  -- love.graphics.setStencil(function ()
+  --   love.graphics.rectangle("fill", x, y, width, height)
+  -- end)
   Object.draw(self)
-  love.graphics.setStencil() -- unset stencil
+  -- love.graphics.setStencil() -- unset stencil
+end
+
+--- Override padding in case a scrollbar is visible
+--  @returns {Number, Number, Number, Number}
+--  @public
+function List:getPadding()
+  local top, right, bottom, left = Object.getPadding(self)
+
+  if self.verticalScrollBar.isVisible then
+    right = right + self.verticalScrollBar:getWidth()
+  end
+
+  return top, right, bottom, left
 end
 
 --- Adds an item to this list
@@ -38,6 +59,18 @@ function List:addItem(item)
   self.items[#self.items + 1] = item
   item:setIndex(#self.items)
   self:addChild(item)
+
+  self.verticalScrollBar:setContentSize(self:getContentHeight())
+end
+
+--- Returns the total height of the list
+function List:getContentHeight()
+  -- Get the last object
+  local item = self.items[#self.items]
+  if not item then return 0 end -- No items == no height
+
+  local y, height = item:getY(), item:getHeight()
+  return y + height
 end
 
 --- Sets the list type

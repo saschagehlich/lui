@@ -10,6 +10,9 @@ local DefaultTheme = class("DefaultTheme")
 DefaultTheme.lightColor = { 255, 255, 255, 80 }
 DefaultTheme.shadowColor = { 0, 0, 0, 80 }
 
+-- Scrollbars
+DefaultTheme.scrollbarSize = 12
+
 -- Spacings
 DefaultTheme.windowPadding = {
   top = 30,
@@ -26,6 +29,20 @@ function DefaultTheme:initialize(lui)
   self.font = love.graphics.newFont(12)
   self.windowTitleFont = self.font
   self.buttonFont = self.font
+end
+
+--- Draws the given scrollbar
+--  @param {ScrollBar} scrollbar
+function DefaultTheme:drawScrollBar(scrollbar)
+  local x, y = scrollbar:getPosition()
+  local width, height = scrollbar:getSize()
+
+  -- Draw background
+  love.graphics.setColor(scrollbar.scheme.scrollBarBackgroundColor)
+  love.graphics.rectangle("fill", x, y, width, height)
+
+  -- Reset color
+  love.graphics.setColor(255, 255, 255)
 end
 
 --- Draws the given tooltip

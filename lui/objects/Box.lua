@@ -474,7 +474,6 @@ end
 --  @param {Number|String} left (optional)
 --  @public
 function Box:setPadding(top, right, bottom, left)
-  print(top, right, bottom, left)
   if top ~= nil and right ~= nil and bottom ~= nil and left ~= nil then
     self.padding.top = top
     self.padding.right = right
@@ -545,6 +544,7 @@ end
 --  @param {Object} object
 --  @public
 function Box:addChild(object)
+  assert(object, "Box:addChild: No object given.")
   self.children[#self.children + 1] = object
   object:setParent(self)
 end
@@ -553,8 +553,23 @@ end
 --  @param {Object} object
 --  @public
 function Box:addInternal(object)
+  assert(object, "Box:addInternal: No object given.")
   self.internals[#self.internals + 1] = object
   object:setParent(self)
+end
+
+--- Sets the width
+--  @param {Number} width
+--  @public
+function Box:setWidth(width)
+  self.size.width = width
+end
+
+--- Sets the height
+--  @param {Number} height
+--  @public
+function Box:setHeight(height)
+  self.size.height = height
 end
 
 --- Displays the object

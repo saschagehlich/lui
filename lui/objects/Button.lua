@@ -11,6 +11,8 @@ local Button = class("Button", Object)
 function Button:initialize(lui, text)
   Object.initialize(self, lui)
 
+  self.isClickable = true
+
   self.text = text or ""
   self.size = { width = 100, height = 30 }
   self.showPointer = true

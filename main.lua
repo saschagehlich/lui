@@ -12,7 +12,7 @@ function love.load()
   window:show()
   window:setScheme("Red")
   window:setPadding(40, 0, 0, 0)
-  window:setLockedTo(gui.root)
+  window:setLockedToParent(true)
   window:setCenter()
 
   local panel = gui:createPanel()

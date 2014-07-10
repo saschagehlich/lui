@@ -43,9 +43,7 @@ function ListItem:getY()
     list:eachItemBefore(self.index, function (item)
       y = y + item:getHeight() + list.spacing.y
     end)
-
     y = y + defaultY
-
     return y
   end
 

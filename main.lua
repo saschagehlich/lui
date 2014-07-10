@@ -50,6 +50,10 @@ function love.draw()
   love.graphics.print("FPS: " .. love.timer.getFPS(), 5, 5)
 end
 
+function love.mousepressed(x, y, btn)
+  gui:mousepressed(x, y, btn)
+end
+
 function love.keypressed(key)
   if key == "escape" then
     love.event.quit()

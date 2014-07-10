@@ -25,6 +25,8 @@ function List:initialize(lui)
   self.itemsGroup = self.lui:createGroup()
   self.itemsGroup:setSize(lui.percent(100), lui.percent(100))
   self:addChild(self.itemsGroup)
+
+  self.lui:on("mousepressed", self._onMousePressed, self)
 end
 
 function List:update(dt)
@@ -48,6 +50,18 @@ function List:draw()
   love.graphics.setStencil() -- unset stencil
 end
 
+--- Gets called when a mouse button has been pressed. We
+--  are using this for scrolling behavior
+function List:_onMousePressed(x, y, button)
+  if self.isHovered then
+    if button == "wu" then
+      self:_scrollUp()
+    elseif button == "wd" then
+      self:_scrollDown()
+    end
+  end
+end
+
 --- Gets called when the scrollbar is scrolling
 --  @param {ScrollBar} object
 --  @param {Number} progress
@@ -58,6 +72,18 @@ function List:_onVerticalScroll(object, progress)
   local invisibleHeight = contentHeight - visibleHeight
 
   self.itemsGroup.offset.y = invisibleHeight * progress
+end
+
+--- Gets called when the user scrolls up inside the list
+--  @private
+function List:_scrollUp()
+  self.verticalScrollBar:scrollUp()
+end
+
+--- Gets called when the user scrolls down inside the list
+--  @private
+function List:_scrollDown()
+  self.verticalScrollBar:scrollDown()
 end
 
 --- Override padding in case a scrollbar is visible

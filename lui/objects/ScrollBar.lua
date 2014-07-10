@@ -20,6 +20,7 @@ function ScrollBar:initialize(lui, type)
   self.contentSize = 0
   self.visibleSize = 0
   self.scrollProgress = 0
+  self.distancePerScroll = 20
 
   local buttonWidth = self.theme.scrollbarSize
   local buttonHeight = self.theme.scrollbarSize
@@ -49,9 +50,19 @@ function ScrollBar:initialize(lui, type)
   if self.type == "vertical" then
     self.scrollArea:setSize(scrollAreaWidth, lui.percent(100))
     self.scrollArea:setPosition(0, buttonHeight)
+
+    -- @TODO: Dirty hack until I added margin support
+    self.scrollArea.getHeight = function(self)
+      return Object.getHeight(self) - buttonHeight * 2
+    end
   else
     self.scrollArea:setPosition(buttonWidth, 0)
-    self.scrollArea:setSize("100% - " .. buttonWidth * 2, scrollAreaHeight)
+    self.scrollArea:setSize(lui.percent(100), scrollAreaHeight)
+
+    -- @TODO: Dirty hack until I added margin support
+    self.scrollArea.getWidth = function(self)
+      return Object.getWidth(self) - buttonWidth * 2
+    end
   end
   self:addInternal(self.scrollArea)
 
@@ -113,6 +124,20 @@ function ScrollBar:_onScrollerDrag(object, x, y)
   self:emit("scroll", self, self.scrollProgress)
 end
 
+--- Updates the scroller button position depending on the
+--  current progress
+--  @private
+function ScrollBar:_updateScrollerPosition()
+  local freeAreaSize
+  if self.type == "vertical" then
+    freeAreaSize = self.scrollArea:getHeight() - self.scrollerButton:getHeight()
+    self.scrollerButton:setY(freeAreaSize * self.scrollProgress)
+  else
+    freeAreaSize = self.scrollArea:getWidth() - self.scrollerButton:getWidth()
+    self.scrollerButton:setX(freeAreaSize * self.scrollProgress)
+  end
+end
+
 --- Sets the visible size
 --  @param {Number} visibleSize
 --  @public
@@ -135,6 +160,32 @@ function ScrollBar:setContentSize(contentSize)
   end
 
   self.contentSize = contentSize
+end
+
+--- Scrolls up
+--  @public
+function ScrollBar:scrollUp()
+  local scrollPosition = self.contentSize * self.scrollProgress
+  scrollPosition = scrollPosition - self.distancePerScroll
+
+  self.scrollProgress = scrollPosition / self.contentSize
+  self.scrollProgress = math.max(math.min(1, self.scrollProgress), 0)
+
+  self:emit("scroll", self, self.scrollProgress)
+  self:_updateScrollerPosition()
+end
+
+--- Scrolls down
+--  @public
+function ScrollBar:scrollDown()
+  local scrollPosition = self.contentSize * self.scrollProgress
+  scrollPosition = scrollPosition + self.distancePerScroll
+
+  self.scrollProgress = scrollPosition / self.contentSize
+  self.scrollProgress = math.max(math.min(1, self.scrollProgress), 0)
+
+  self:emit("scroll", self, self.scrollProgress)
+  self:_updateScrollerPosition()
 end
 
 return ScrollBar

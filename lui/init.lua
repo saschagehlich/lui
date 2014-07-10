@@ -1,5 +1,6 @@
 local path = ...
 local class = require(path .. ".lib.middleclass")
+local EventEmitter = require(path .. ".objects.mixins.EventEmitter")
 
 local lui = class("lui")
 
@@ -24,6 +25,8 @@ function lui.percent (value)
   return { value = value, type = "percent" }
 end
 
+lui:include(EventEmitter)
+
 --- The main entry point / constructor
 --  @param {Table} config
 function lui:initialize(config)
@@ -41,6 +44,8 @@ function lui:initialize(config)
   self.defaultScheme = self:getScheme("Blue")
 
   self.root = self:createRoot()
+
+  EventEmitter._init(self)
 end
 
 --- Builds `lui:create{ObjectName}` methods for all available object types
@@ -177,6 +182,15 @@ function lui:getScheme(name)
     "Scheme " .. name .. " does not exist."
   )
   return self.availableSchemes[name]
+end
+
+--- Gets called when the love's mousepressed method has been
+--  called. Emits an event so that other objects can grab it.
+--  @param {Number} x
+--  @param {Number} y
+--  @param {MouseConstant} button
+function lui:mousepressed(x, y, button)
+  self:emit("mousepressed", x, y, button)
 end
 
 return lui

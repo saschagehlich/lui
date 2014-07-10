@@ -423,6 +423,26 @@ function Box:setPosition(x, y)
   self.center = nil
 end
 
+--- Sets the X position
+--  @param {Number} x
+--  @public
+function Box:setX(x)
+  self.position.left = x
+
+  -- Unset center object when moving
+  self.center = nil
+end
+
+--- Sets the Y position
+--  @param {Number} y
+--  @public
+function Box:setY(y)
+  self.position.top = y
+
+  -- Unset center object when moving
+  self.center = nil
+end
+
 --- Sets the size
 --  @param {Number|Percent} width
 --  @param {Number|Percent} height

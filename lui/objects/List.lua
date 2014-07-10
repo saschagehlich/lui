@@ -19,9 +19,14 @@ function List:initialize(lui)
   self.verticalScrollBar:setPositionMode("absolute")
   self.verticalScrollBar:setPosition({ right = 0, top = 0 })
   self.verticalScrollBar:setHeight("100%")
-  self.verticalScrollBar:setVisibleSize(self:getHeight())
 
   self:addChild(self.verticalScrollBar)
+end
+
+function List:update(dt)
+  self.verticalScrollBar:setVisibleSize(self:getHeight())
+
+  Object.update(self, dt)
 end
 
 --- Draws the list
@@ -32,11 +37,11 @@ function List:draw()
   local width, height = self:getSize()
 
   -- Draw children
-  -- love.graphics.setStencil(function ()
-  --   love.graphics.rectangle("fill", x, y, width, height)
-  -- end)
+  love.graphics.setStencil(function ()
+    love.graphics.rectangle("fill", x, y, width, height)
+  end)
   Object.draw(self)
-  -- love.graphics.setStencil() -- unset stencil
+  love.graphics.setStencil() -- unset stencil
 end
 
 --- Override padding in case a scrollbar is visible

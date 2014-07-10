@@ -33,6 +33,7 @@ end
 --- Gets called when the mouse is hovering above the button
 --  @public
 function Button:onHover()
+  if self.lui.isDragging then return end
   if self.showPointer then
     self.lui:setCursor("hand", self)
   end
@@ -41,6 +42,7 @@ end
 --- Gets called when the mouse is no longer hovering above the button
 --  @public
 function Button:onBlur()
+  if self.lui.isDragging then return end
   if self.showPointer then
     self.lui:resetCursor()
   end

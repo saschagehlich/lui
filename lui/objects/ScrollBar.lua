@@ -70,6 +70,17 @@ function ScrollBar:initialize(lui, type)
 end
 
 function ScrollBar:update(dt)
+  -- Set the scrollerButton height to represent the visible / content ratio
+  local ratio = self.visibleSize / self.contentSize
+
+  if self.type == "vertical" then
+    local scrollAreaHeight = self.scrollArea:getHeight()
+    self.scrollerButton:setHeight(scrollAreaHeight * ratio)
+  else
+    local scrollAreaWidth = self.scrollArea:getWidth()
+    self.scrollerButton:setWidth(scrollAreaWidth * ratio)
+  end
+
   Object.update(self)
 end
 

@@ -37,6 +37,11 @@ function ScrollBar:initialize(lui, type)
   self.lowerButton:setPosition({ top = 0, left = 0 })
   self.lowerButton:setRepeat(0.5, 0.1)
   self.lowerButton:on("mousepressed repeat", self._onLowerButtonClick, self)
+
+  local lowerButtonImage = self.lui:createImage(self.lui:getThemePath(self.theme) .. "/scrollbar/up.png")
+  self.lowerButton:addChild(lowerButtonImage)
+  lowerButtonImage:setCenter()
+
   self:addInternal(self.lowerButton)
 
   -- The upper boundary button (scroll down or scroll right)
@@ -45,6 +50,11 @@ function ScrollBar:initialize(lui, type)
   self.upperButton:setPosition({ bottom = 0, right = 0 })
   self.upperButton:setRepeat(0.5, 0.1)
   self.upperButton:on("mousepressed repeat", self._onUpperButtonClick, self)
+
+  local upperButtonImage = self.lui:createImage(self.lui:getThemePath(self.theme) .. "/scrollbar/down.png")
+  self.upperButton:addChild(upperButtonImage)
+  upperButtonImage:setCenter()
+
   self:addInternal(self.upperButton)
 
   -- The area where the scroll button will be in

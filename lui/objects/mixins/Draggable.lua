@@ -45,11 +45,11 @@ function Draggable:_handleDragging()
       }
 
       self.isDragging = true
-      self:emit("dragstart")
+      self:emit("dragstart", self)
   elseif not mouseDown and self.isDragging then
     -- Mouse is not down but dragging still active, stop dragging
     self.isDragging = false
-    self:emit("dragend")
+    self:emit("dragend", self)
   elseif mouseDown and self.isDragging then
     -- Dragging
     self:_updateDragging()
@@ -75,6 +75,10 @@ function Draggable:_updateDragging()
   -- Calculate distance
   local distX, distY = x - startDragX, y - startDragY
 
+  if distX == 0 and distY == 0 then
+    return
+  end
+
   -- Add distance to current position
   local posX, posY = startX + distX, startY + distY
   local width, height = self:getSize()
@@ -84,13 +88,21 @@ function Draggable:_updateDragging()
   if self.lockedToParent then
     local parentWidth, parentHeight = self.parent:getSize()
 
-    posX = math.max(0, posX) -- left boundary
-    posX = math.min(posX, parentWidth - width) -- right boundary
-    posY = math.max(0, posY) -- top boundary
-    posY = math.min(posY, parentHeight - height) -- bottom boundary
+    local clampedX = math.max(0, posX) -- left boundary
+    clampedX = math.min(clampedX, parentWidth - width) -- right boundary
+    local clampedY = math.max(0, posY) -- top boundary
+    clampedY = math.min(clampedY, parentHeight - height) -- bottom boundary
+
+    distX = clampedX - startX
+    distY = clampedY - startY
+
+    posX = clampedX
+    posY = clampedY
   end
 
   self:setPosition(posX, posY)
+
+  self:emit("drag", self, distX, distY)
 end
 
 --- Is the mouse on the title bar?

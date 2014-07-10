@@ -1,17 +1,27 @@
 local pathMatch = "(.+)%.objects.Object$"
-local class = require((...):match(pathMatch) .. ".lib.middleclass")
-local calc = require((...):match(pathMatch) .. ".lib.calc")
-local Util = require((...):match(pathMatch) .. ".lib.Util")
-local EventEmitter = require((...):match(pathMatch) .. ".lib.EventEmitter")
+local pathBase = (...):match(pathMatch)
+local class = require(pathBase .. ".lib.middleclass")
+local calc = require(pathBase .. ".lib.calc")
+local Util = require(pathBase .. ".lib.Util")
 
-local Object = class("Object", EventEmitter)
+-- Mixins
+local EventEmitter = require(pathBase .. ".objects.mixins.EventEmitter")
+local Hoverable = require(pathBase .. ".objects.mixins.Hoverable")
+local Clickable = require(pathBase .. ".objects.mixins.Clickable")
+local Draggable = require(pathBase .. ".objects.mixins.Draggable")
+local Tooltippable = require(pathBase .. ".objects.mixins.Tooltippable")
+
+local Object = class("Object")
+Object:include(EventEmitter)
+Object:include(Hoverable)
+Object:include(Clickable)
+Object:include(Draggable)
+Object:include(Tooltippable)
 
 --- `Object` constructor
 --  @param {lui} lui
 function Object:initialize(lui)
   self.lui = lui
-
-  EventEmitter.initialize(self)
 
   self.parent = nil
   self.center = nil
@@ -24,18 +34,9 @@ function Object:initialize(lui)
   -- `relative` = add padding to position
   self.positionMode = "relative"
 
-  self.tooltipDelay = 1
-  self.tooltipFollowsMouse = true
-  self.tooltipDistance = { x = 15, y = 15 }
-
   -- States
   self.isRemoved = false
   self.isVisible = true
-  self.isDraggable = false
-  self.isPressed = false
-
-  self.isDragging = false
-  self.isHovered = false
 
   self.size = { width = 0, height = 0 }
   self.position = { top = 0, left = 0 }
@@ -45,6 +46,12 @@ function Object:initialize(lui)
     right = 0,
     bottom = 0
   }
+
+  EventEmitter._init(self)
+  Hoverable._init(self)
+  Clickable._init(self)
+  Draggable._init(self)
+  Tooltippable._init(self)
 end
 
 --- Update method
@@ -55,7 +62,10 @@ function Object:update(dt)
 
   self:_removeDeadChildren() -- :(
 
-  self:_handleMouse(dt)
+  self:_updateHoverable(dt)
+  self:_updateClickable(dt)
+  self:_updateDraggable(dt)
+  self:_updateTooltippable(dt)
 
   -- Update children
   self:eachChild(function (object)
@@ -66,30 +76,6 @@ function Object:update(dt)
   self:eachInternal(function (object)
     object:update(dt)
   end)
-
-  -- Tooltip delay
-  if self.currentTooltipDelay ~= nil then
-    self.currentTooltipDelay = self.currentTooltipDelay - dt
-    if self.currentTooltipDelay <= 0 then
-      self.tooltip:show()
-      self.tooltip:moveToTop()
-
-      local mouseX, mouseY = love.mouse.getPosition()
-      local distX, distY = self.tooltipDistance.x, self.tooltipDistance.y
-      self.tooltip:setPosition(mouseX + distX, mouseY + distY)
-
-      self.currentTooltipDelay = nil
-    end
-  end
-
-  -- Tooltip follow
-  if self.tooltip and
-    self.tooltip.isVisible and
-    self.tooltipFollowsMouse then
-      local mouseX, mouseY = love.mouse.getPosition()
-      local distX, distY = self.tooltipDistance.x, self.tooltipDistance.y
-      self.tooltip:setPosition(mouseX + distX, mouseY + distY)
-  end
 end
 
 --- Removes children flagged as removed
@@ -205,174 +191,6 @@ function Object:_evaluatePosition(position, coordinate)
       return parentHeight - height - bottom
     end
   end
-end
-
---- Handles mouse interaction
---  @param {Number} dt
---  @private
-function Object:_handleMouse(dt)
-  self:_handleHover()
-  self:_handleClick()
-
-  if self.isDraggable then
-    self:_handleDragging()
-  end
-end
-
---- Handles hover states
---  @private
-function Object:_handleHover()
-  -- Don't change hovered state when dragging
-  if self.dragging then return end
-
-  local x, y = self:getPosition()
-  local width, height = self:getSize()
-
-  -- Rectangular intersection
-  local mouseX, mouseY = love.mouse.getPosition()
-  if not (mouseX < x or
-    mouseX > x + width or
-    mouseY < y or
-    mouseY > y + height) then
-      -- Update hovered state, emit `hover` event
-      if not self.isHovered then
-        self:emit("hover", self)
-        self:_onHover()
-        self.isHovered = true
-      end
-  else
-    -- Update hovered state, emit `blur` event
-    if self.isHovered then
-      self.isHovered = false
-      self:_onBlur()
-      self:emit("blur", self)
-    end
-  end
-end
-
---- Gets called when hovering starts
---  @public
-function Object:_onHover()
-  if self.tooltip then
-    self.currentTooltipDelay = self.tooltipDelay
-  end
-end
-
---- Gets called when hovering has ended
---  @public
-function Object:_onBlur()
-  if self.tooltip then
-    self.tooltip:hide()
-    self.currentTooltipDelay = nil
-  end
-end
-
---- Handles object clicking
---  @private
-function Object:_handleClick()
-  local mouseDown = love.mouse.isDown("l")
-  if self.isHovered and mouseDown and not self.isPressed then
-    self:emit("mousepressed")
-    self.isPressed = true
-  else
-    if not mouseDown and self.isPressed then
-      self:emit("mousereleased")
-      self.isPressed = false
-      if self.isHovered then
-        self:emit("click")
-      end
-    end
-  end
-end
-
---- Handles object dragging
---  @private
-function Object:_handleDragging()
-  -- Handle dragging state
-  local mouseDown = love.mouse.isDown("l")
-  local mouseOnDraggingArea = self:_isMouseOnDraggingArea()
-  if mouseDown and not self.isDragging and mouseOnDraggingArea then
-    -- Not dragging but mouse is down, start dragging
-    local x, y = love.mouse.getPosition()
-
-    self.startDragPosition = {
-      x = x,
-      y = y
-    }
-
-    local startX, startY = self:getPosition()
-    self.startPosition = {
-      x = startX,
-      y = startY
-    }
-
-    self.isDragging = true
-  elseif not mouseDown and self.isDragging then
-    -- Mouse is not down but dragging still active, stop dragging
-    self.isDragging = false
-  elseif mouseDown and self.isDragging then
-    -- Dragging
-    self:_updateDragging()
-  end
-
-  -- If we're dragging, we're also hovering
-  if self.isDragging then
-    self.isHovered = true
-  end
-end
-
---- Update the position when dragging
---  @private
-function Object:_updateDragging()
-  local x, y = love.mouse:getPosition()
-  local startDragX, startDragY =
-    self.startDragPosition.x,
-    self.startDragPosition.y
-  local startX, startY =
-    self.startPosition.x,
-    self.startPosition.y
-
-  -- Calculate distance
-  local distX, distY = x - startDragX, y - startDragY
-
-  -- Add distance to current position
-  local posX, posY = startX + distX, startY + distY
-  local width, height = self:getSize()
-
-  -- If this object is locked to another object, make sure we can't drag
-  -- it outside
-  if self.lockedToObject then
-    local lockedX, lockedY = self.lockedToObject:getPosition()
-    local lockedWidth, lockedHeight = self.lockedToObject:getSize()
-
-    posX = math.max(lockedX, posX) -- left boundary
-    posX = math.min(posX, lockedX + lockedWidth - width) -- right boundary
-    posY = math.max(lockedY, posY) -- top boundary
-    posY = math.min(posY, lockedY + lockedHeight - height) -- bottom boundary
-  end
-
-  self:setPosition(posX, posY)
-end
-
---- Is the mouse on the title bar?
---  @returns {Boolean}
---  @private
-function Object:_isMouseOnDraggingArea()
-  -- Quit early if not hovering
-  if not self.isHovered then
-    return false
-  end
-
-  local x, y = self:getPosition()
-  local mouseX, mouseY = love.mouse.getPosition()
-  local mousePosition = { x = mouseX, y = mouseY }
-  local draggingArea = {
-    x = x + self:_evaluateNumber(self.draggingArea.x, "x"),
-    y = y + self:_evaluateNumber(self.draggingArea.y, "y"),
-    width = self:_evaluateNumber(self.draggingArea.width, "x"),
-    height = self:_evaluateNumber(self.draggingArea.height, "y")
-  }
-  return Util.pointIntersectsWithRect(mousePosition, draggingArea)
 end
 
 --[[

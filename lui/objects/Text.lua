@@ -95,7 +95,7 @@ function Text:getTextSize()
     width = self.maxWidth
   end
 
-  local font = self.lui.skin.buttonFont
+  local font = self.theme.buttonFont
   local lineHeight = font:getLineHeight() * font:getHeight()
 
   love.graphics.setFont(font)

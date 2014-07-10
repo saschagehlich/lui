@@ -1,27 +1,37 @@
 local path = ...
 local class = require(path .. ".lib.middleclass")
-local DefaultSkin = require(path .. ".skins.Default")
 
 local lui = class("lui")
 
 lui.availableObjects = {
   "Object", "Root", "Group",
-
   "Window", "Panel", "Tooltip",
   "Button", "Text", "Image"
+}
+
+lui.availableSchemes = {
+  Blue = require(path .. ".schemes.Blue"),
+  Gray = require(path .. ".schemes.Gray"),
+  Red = require(path .. ".schemes.Red")
+}
+
+lui.availableThemes = {
+  Default = require(path .. ".themes.Default")
 }
 
 --- The main entry point / constructor
 --  @param {Table} config
 function lui:initialize(config)
   self.config = config
-  self.skin = DefaultSkin(self)
   self.objects = {}
 
   -- States
   self.isHovered = false
 
   self:_buildCreators()
+
+  self.defaultTheme = self:getTheme("Default")
+  self.defaultScheme = self:getScheme("Blue")
 
   self.root = self:createRoot()
 end
@@ -107,6 +117,30 @@ function lui:draw()
   love.graphics.setLineStyle("rough")
 
   self.root:draw()
+end
+
+--- Returns the theme with the given name
+--  @param {String} name
+--  @returns {Theme} theme
+--  @public
+function lui:getTheme(name)
+  assert(
+    self.availableThemes[name],
+    "Theme " .. name .. " does not exist."
+  )
+  return self.availableThemes[name](self.lui)
+end
+
+--- Returns the color scheme with the given name
+--  @param {String} name
+--  @returns {Scheme} theme
+--  @public
+function lui:getScheme(name)
+  assert(
+    self.availableSchemes[name],
+    "Scheme " .. name .. " does not exist."
+  )
+  return self.availableSchemes[name]
 end
 
 return lui

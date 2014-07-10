@@ -56,7 +56,7 @@ end
 --- Draws the Button
 function Button:draw()
   if self.isVisible then
-    self.lui.skin:drawButton(self)
+    self.theme:drawButton(self)
   end
 
   Object.draw(self)

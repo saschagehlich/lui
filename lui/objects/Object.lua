@@ -27,6 +27,9 @@ Object:include(Tooltippable)
 function Object:initialize(lui)
   Box.initialize(self, lui)
 
+  self.theme = self.lui.defaultTheme
+  self.scheme = self.lui.defaultScheme
+
   EventEmitter._init(self)
   Hoverable._init(self)
   Clickable._init(self)
@@ -61,6 +64,36 @@ function Object:draw()
   -- Draw internals
   self:eachInternal(function (object)
     object:draw()
+  end)
+end
+
+--- Sets the theme of this object
+--  @param {String}
+--  @public
+function Object:setTheme(name)
+  self.theme = self.lui:getTheme(name)
+
+  self:eachChild(function (child)
+    child:setTheme(name)
+  end)
+
+  self:eachInternal(function (child)
+    child:setTheme(name)
+  end)
+end
+
+--- Sets the color scheme of this object
+--  @param {String}
+--  @public
+function Object:setScheme(name)
+  self.scheme = self.lui:getScheme(name)
+
+  self:eachChild(function (child)
+    child:setScheme(name)
+  end)
+
+  self:eachInternal(function (child)
+    child:setScheme(name)
   end)
 end
 

@@ -25,7 +25,7 @@ end
 --- Draws the Tooltip
 function Tooltip:draw()
   if self.isVisible then
-    self.lui.skin:drawTooltip(self)
+    self.theme:drawTooltip(self)
   end
 
   Object.draw(self)

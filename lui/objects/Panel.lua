@@ -17,7 +17,7 @@ end
 --- Draws the Panel
 function Panel:draw()
   if self.isVisible then
-    self.lui.skin:drawPanel(self)
+    self.theme:drawPanel(self)
   end
 
   Object.draw(self)

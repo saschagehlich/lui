@@ -1,35 +1,27 @@
-local pathMatch = "(.+)%.skins.Default$"
+local pathMatch = "(.+)%.themes.Default$"
 local basePath = (...):match(pathMatch)
 
 local class = require(basePath .. ".lib.middleclass")
 local Object = require(basePath .. ".objects.Object")
 
-local DefaultSkin = class("DefaultSkin")
+local DefaultTheme = class("DefaultTheme")
 
--- Colors
-DefaultSkin.windowBackgroundColor = { 112, 131, 125 }
-DefaultSkin.panelBackgroundColor = { 159, 183, 111 }
-DefaultSkin.tooltipBackgroundColor = { 159, 183, 111 }
--- DefaultSkin.panelBackgroundColor = { 255, 0, 0, 128 }
-DefaultSkin.buttonBackgroundColor = { 112, 131, 125 }
-DefaultSkin.buttonPressedBackgroundColor = { 159, 175, 175 }
-DefaultSkin.titleBarBackgroundColor = { 47, 67, 67 }
-
-DefaultSkin.lightColor = { 255, 255, 255, 50 }
-DefaultSkin.shadowColor = { 0, 0, 0, 50 }
+-- Generic
+DefaultTheme.lightColor = { 255, 255, 255, 80 }
+DefaultTheme.shadowColor = { 0, 0, 0, 80 }
 
 -- Spacings
-DefaultSkin.windowPadding = {
+DefaultTheme.windowPadding = {
   top = 30,
   right = 5,
   bottom = 5,
   left = 5
 }
-DefaultSkin.windowTitleBarHeight = 25
+DefaultTheme.windowTitleBarHeight = 25
 
 --- Constructor
 --  @param {lui} lui
-function DefaultSkin:initialize(lui)
+function DefaultTheme:initialize(lui)
   self.lui = lui
   self.font = love.graphics.newFont(12)
   self.windowTitleFont = self.font
@@ -38,12 +30,12 @@ end
 
 --- Draws the given tooltip
 --  @param {Tooltip} tooltip
-function DefaultSkin:drawTooltip(tooltip)
+function DefaultTheme:drawTooltip(tooltip)
   local x, y = tooltip:getPosition()
   local width, height = tooltip:getSize()
 
   -- Draw background
-  love.graphics.setColor(self.tooltipBackgroundColor)
+  love.graphics.setColor(tooltip.scheme.tooltipBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)
 
   -- Reset color
@@ -52,7 +44,7 @@ end
 
 --- Draws the given window
 --  @param {Window} window
-function DefaultSkin:drawWindow(window)
+function DefaultTheme:drawWindow(window)
   local x, y = window:getPosition()
 
   self:drawWindowBackground(window, x, y)
@@ -62,12 +54,12 @@ end
 
 --- Draws the given panel
 --  @param {Panel} panel
-function DefaultSkin:drawPanel(panel)
+function DefaultTheme:drawPanel(panel)
   local x, y = panel:getPosition()
   local width, height = panel:getSize()
 
   -- Draw background
-  love.graphics.setColor(self.panelBackgroundColor)
+  love.graphics.setColor(panel.scheme.panelBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)
 
   self:drawLighting(false, x, y, width, height)
@@ -78,14 +70,14 @@ end
 
 --- Draws the given button
 --  @param {Button} button
-function DefaultSkin:drawButton(button)
+function DefaultTheme:drawButton(button)
   local x, y = button:getPosition()
   local width, height = button:getSize()
 
-  local color = self.buttonBackgroundColor
+  local color = button.scheme.buttonBackgroundColor
   local lightingInset = false
   if button.isPressed or button.isToggled then
-    color = self.buttonPressedBackgroundColor
+    color = button.scheme.buttonPressedBackgroundColor
     lightingInset = true
   end
 
@@ -99,11 +91,11 @@ end
 --  @param {Window} window
 --  @param {Number} x
 --  @param {Number} y
-function DefaultSkin:drawWindowBackground(window, x, y)
+function DefaultTheme:drawWindowBackground(window, x, y)
   local width, height = window:getSize()
 
   -- Draw background
-  love.graphics.setColor(self.windowBackgroundColor)
+  love.graphics.setColor(window.scheme.windowBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)
 
   self:drawLighting(false, x, y, width, height)
@@ -116,13 +108,13 @@ end
 --  @param {Window} window
 --  @param {Number} x
 --  @param {Number} y
-function DefaultSkin:drawWindowTitleBarBackground(window, x, y)
+function DefaultTheme:drawWindowTitleBarBackground(window, x, y)
   local width = window:_evaluateNumber(window.size.width, "x") - 4
   local height = self.windowTitleBarHeight
   local x, y = x + 2, y + 2
 
   -- Draw background
-  love.graphics.setColor(self.titleBarBackgroundColor)
+  love.graphics.setColor(window.scheme.windowTitleBarBackgroundColor)
   love.graphics.rectangle("fill", x, y, width, height)
 
   self:drawLighting(true, x, y, width, height)
@@ -137,7 +129,7 @@ end
 --  @param {Number} y
 --  @param {Number} width
 --  @param {Number} height
-function DefaultSkin:drawLighting(inset, x, y, width, height)
+function DefaultTheme:drawLighting(inset, x, y, width, height)
   local points
   if inset == true then
     points = {
@@ -184,11 +176,11 @@ end
 --  @param {Window} window
 --  @param {Number} x
 --  @param {Number} y
-function DefaultSkin:drawWindowTitleBarContent(window, x, y)
+function DefaultTheme:drawWindowTitleBarContent(window, x, y)
   love.graphics.setFont(self.windowTitleFont)
 
   local width = window:_evaluateNumber(window.size.width, "x")
   love.graphics.printf(window.title, x, y + 7, width, "center")
 end
 
-return DefaultSkin
+return DefaultTheme

@@ -91,8 +91,10 @@ function List:getContentHeight()
   local item = self.items[#self.items]
   if not item then return 0 end -- No items == no height
 
-  local y, height = item:getY(), item:getHeight()
-  return y + height
+  local y, height = item:getY(true), item:getHeight()
+  local top, right, bottom, left = self:getPadding()
+
+  return y + height + top + bottom
 end
 
 --- Sets the list type

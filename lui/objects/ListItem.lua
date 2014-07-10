@@ -33,10 +33,11 @@ function ListItem:getHeight()
 end
 
 --- Overrides the y position depending on the index
+--  @param {Boolean} relative
 --  @returns {Number}
 --  @public
-function ListItem:getY()
-  local defaultY = Object.getY(self)
+function ListItem:getY(relative)
+  local defaultY = Object.getY(self, relative)
 
   local list = self.list
   if list.type == "vertical" then
@@ -55,6 +56,13 @@ end
 function ListItem:draw()
   local x, y = self:getPosition()
   local width, height = self:getSize()
+
+  local relativeY = self:getY(relative)
+  local listTop = self.list:getY(relative)
+  local listBottom = listTop + self.list:getHeight()
+  if relativeY > listBottom or relativeY + height < listTop then
+    return
+  end
 
   love.graphics.setColor(255, 0, 0)
   love.graphics.rectangle("fill", x, y, width, height)

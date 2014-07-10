@@ -18,7 +18,7 @@ function love.load()
   local panel = gui:createPanel()
   panel:setPosition(0, 40)
   panel:setScheme("Gray")
-  panel:setSize(640, 480)
+  panel:setSize(lui.percent(100), lui.percent(100))
   panel:setPadding(5, 5)
   window:addChild(panel)
 

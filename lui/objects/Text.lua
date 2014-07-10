@@ -18,6 +18,7 @@ function Text:initialize(lui, text)
     x = "left",
     y = "top"
   }
+  self.color = self.scheme.textColor
 end
 
 --- Draws the Text
@@ -33,7 +34,7 @@ function Text:draw()
     y = y + (height - textHeight)
   end
 
-  love.graphics.setColor(0, 0, 0)
+  love.graphics.setColor(self.color)
   love.graphics.printf(self.text, x, y, width, self.alignment.x)
 
   Object.draw(self)
@@ -87,6 +88,9 @@ function Text:getHeight()
   end
 end
 
+--- Returns the size of the text
+--  @returns {Number, Number}
+--  @public
 function Text:getTextSize()
   local width
   if self.size.width then
@@ -110,6 +114,18 @@ function Text:getTextSize()
   end
 
   return textWidth, totalTextHeight
+end
+
+--- Sets the color of this text
+--  @param {Table|Number} color|r
+--  @public
+function Text:setColor(color, g, b, a)
+  if type(color) == "table" then
+    self.color = color
+    return
+  end
+
+  self.color = { color, g, b, a }
 end
 
 return Text

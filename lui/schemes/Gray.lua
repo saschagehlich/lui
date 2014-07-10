@@ -1,4 +1,7 @@
 local Gray = {
+  -- Text
+  textColor = { 255, 255, 255 },
+
   -- Window
   windowBackgroundColor = { 131, 151, 151 },
   windowTitleBarBackgroundColor = { 91, 115, 115 },

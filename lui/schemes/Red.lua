@@ -1,4 +1,7 @@
 local Red = {
+  -- Text
+  textColor = { 255, 255, 255 },
+
   -- Window
   windowBackgroundColor = { 179, 79, 79 },
   windowTitleBarBackgroundColor = { 95, 7, 7 },

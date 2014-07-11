@@ -239,10 +239,6 @@ function Box:getY(relative)
     y = y + top
   end
 
-  -- Add top margin
-  local top = self:getMargin()
-  y = y + top
-
   -- If centering is enabled for x or y, set the position to
   -- the center
   if self.center then

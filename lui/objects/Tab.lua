@@ -11,8 +11,8 @@ Tab.static.addToCreator = false
 
 --- `Tab` constructor
 --  @param {lui} lui
-function Tab:initialize(lui)
-  Button.initialize(self, lui)
+function Tab:initialize(lui, text)
+  Button.initialize(self, lui, text)
 
   self.index = 0
   self.tabs = nil

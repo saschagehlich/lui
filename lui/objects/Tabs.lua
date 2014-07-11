@@ -36,6 +36,7 @@ function Tabs:setTabSize(width, height)
   self.tabSize.height = height
 
   self.tabsGroup:setSize(self.lui.percent(100), height)
+
   self.contentGroup:setMargin(self.tabSize.height, 0, 0, 0)
 
   self:eachTab(function (tab)

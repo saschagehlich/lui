@@ -30,8 +30,13 @@ function Box:initialize(lui)
   self.centerFlags = { x = false, y = false }
   self.size = { width = 0, height = 0 }
   self.position = { top = 0, left = 0 }
-  self.offset = { x = 0, y = 0 }
   self.padding = {
+    top = 0,
+    left = 0,
+    right = 0,
+    bottom = 0
+  }
+  self.margin = {
     top = 0,
     left = 0,
     right = 0,
@@ -174,7 +179,7 @@ end
   Public methods
 ]]--
 
---- Gets the drawing position (considering offset etc.)
+--- Gets the drawing position (considering parent offset etc.)
 --  @param {Boolean} relative
 --  @returns {Number, Number}
 --  @public
@@ -199,6 +204,10 @@ function Box:getX(relative)
       local top, right, bottom, left = self.parent:getPadding()
       x = x + left
     end
+
+    -- Add parent margin
+    local top, right, bottom, left = self.parent:getMargin()
+    x = x + left
   end
 
   -- If centering is enabled for x or y, set the position to
@@ -208,8 +217,6 @@ function Box:getX(relative)
     local width = self:getWidth()
     x = centerX - width / 2
   end
-
-  x = x - self.offset.x
 
   return Util.round(x)
 end
@@ -231,6 +238,10 @@ function Box:getY(relative)
       local top, right, bottom, left = self.parent:getPadding()
       y = y + top
     end
+
+    -- Add parent margin
+    local top, right, bottom, left = self.parent:getMargin()
+    y = y + top
   end
 
   -- If centering is enabled for x or y, set the position to
@@ -242,8 +253,6 @@ function Box:getY(relative)
       y = centerY - height / 2
     end
   end
-
-  y = y - self.offset.y
 
   return Util.round(y)
 end
@@ -289,14 +298,18 @@ end
 --  @returns {Number}
 --  @public
 function Box:getWidth()
-  return self:_evaluateNumber(self.size.width, "x")
+  local width = self:_evaluateNumber(self.size.width, "x")
+  local top, right, bottom, left = self:getMargin()
+  return width - left - right
 end
 
 --- Gets the drawing height
 --  @returns {Number}
 --  @public
 function Box:getHeight()
-  return self:_evaluateNumber(self.size.height, "y")
+  local height = self:_evaluateNumber(self.size.height, "y")
+  local top, right, bottom, left = self:getMargin()
+  return height - top - bottom
 end
 
 --- Gets the inner size
@@ -314,13 +327,18 @@ end
 --  @public
 function Box:getInnerWidth(ignorePadding)
   local width = self:getWidth()
+
+  local marginX = 0
+  local top, right, bottom, left = self:getMargin()
+  marginX = left + right
+
   local paddingX = 0
   if self.positionMode == "relative" and not ignorePadding then
     local top, right, bottom, left = self:getPadding()
     paddingX = left + right
   end
 
-  return width - paddingX
+  return width - paddingX - marginX
 end
 
 --- Gets the inner height
@@ -329,23 +347,40 @@ end
 --  @public
 function Box:getInnerHeight(ignorePadding)
   local height = self:getHeight()
+
+  local marginY = 0
+  local top, right, bottom, left = self:getMargin()
+  marginY = top + bottom
+
   local paddingY = 0
   if self.positionMode == "relative" and not ignorePadding then
     local top, right, bottom, left = self:getPadding()
     paddingY = top + bottom
   end
 
-  return height - paddingY
+  return height - paddingY - marginY
 end
 
 --- Gets the padding
---  @returns {Number, Number}
+--  @returns {Number, Number, Number, Number}
 --  @private
 function Box:getPadding()
   local top = self:_evaluateNumber(self.padding.top, "y", true)
   local right = self:_evaluateNumber(self.padding.right, "x", true)
   local bottom = self:_evaluateNumber(self.padding.bottom, "y", true)
   local left = self:_evaluateNumber(self.padding.left, "x", true)
+
+  return top, right, bottom, left
+end
+
+--- Gets the margin
+--  @returns {Number, Number, Number, Number}
+--  @private
+function Box:getMargin()
+  local top = self:_evaluateNumber(self.margin.top, "y", true)
+  local right = self:_evaluateNumber(self.margin.right, "x", true)
+  local bottom = self:_evaluateNumber(self.margin.bottom, "y", true)
+  local left = self:_evaluateNumber(self.margin.left, "x", true)
 
   return top, right, bottom, left
 end
@@ -466,15 +501,6 @@ function Box:setInnerSize(width, height)
   self:setSize(width + left + right, height + top + bottom)
 end
 
---- Sets the offset for this box
---  @param {Number} x
---  @param {Number} y
---  @public
-function Box:setOffset(x, y)
-  self.offset.x = x
-  self.offset.y = y
-end
-
 --- Sets the padding
 --  @param {Number|String} top
 --  @param {Number|String} right
@@ -499,6 +525,33 @@ function Box:setPadding(top, right, bottom, left)
     self.padding.right = padding
     self.padding.bottom = padding
     self.padding.left = padding
+  end
+end
+
+--- Sets the margin
+--  @param {Number|String} top
+--  @param {Number|String} right
+--  @param {Number|String} bottom (optional)
+--  @param {Number|String} left (optional)
+--  @public
+function Box:setMargin(top, right, bottom, left)
+  if top ~= nil and right ~= nil and bottom ~= nil and left ~= nil then
+    self.margin.top = top
+    self.margin.right = right
+    self.margin.bottom = bottom
+    self.margin.left = left
+  elseif top ~= nil and right ~= nil then
+    local vertical, horizontal = top, right
+    self.margin.top = vertical
+    self.margin.right = horizontal
+    self.margin.bottom = vertical
+    self.margin.left = horizontal
+  elseif top ~= nil then
+    local margin = top
+    self.margin.top = margin
+    self.margin.right = margin
+    self.margin.bottom = margin
+    self.margin.left = margin
   end
 end
 

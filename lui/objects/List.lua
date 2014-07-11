@@ -71,7 +71,7 @@ function List:_onVerticalScroll(object, progress)
   local visibleHeight = self.verticalScrollBar.visibleSize
   local invisibleHeight = contentHeight - visibleHeight
 
-  self.itemsGroup.offset.y = invisibleHeight * progress
+  self.itemsGroup:setMargin(-invisibleHeight * progress, 0, 0, 0)
 end
 
 --- Gets called when the user scrolls up inside the list

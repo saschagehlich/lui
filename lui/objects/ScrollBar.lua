@@ -63,20 +63,11 @@ function ScrollBar:initialize(lui, type)
   self.scrollArea = self.lui:createGroup()
   if self.type == "vertical" then
     self.scrollArea:setSize(scrollAreaWidth, lui.percent(100))
-    self.scrollArea:setPosition(0, buttonHeight)
-
-    -- @TODO: Dirty hack until I added margin support
-    self.scrollArea.getHeight = function(self)
-      return Object.getHeight(self) - buttonHeight * 2
-    end
+    self.scrollArea:setMargin(buttonHeight, 0)
   else
     self.scrollArea:setPosition(buttonWidth, 0)
     self.scrollArea:setSize(lui.percent(100), scrollAreaHeight)
-
-    -- @TODO: Dirty hack until I added margin support
-    self.scrollArea.getWidth = function(self)
-      return Object.getWidth(self) - buttonWidth * 2
-    end
+    self.scrollArea:setMargin(0, buttonWidth)
   end
   self:addInternal(self.scrollArea)
 

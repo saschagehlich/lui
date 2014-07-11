@@ -57,6 +57,7 @@ function ListItem:draw()
   local x, y = self:getPosition()
   local width, height = self:getSize()
 
+  -- Don't draw items that are outside the viewport
   local relativeY = self:getY(relative)
   local listTop = self.list:getY(relative)
   local listBottom = listTop + self.list:getHeight()
@@ -64,8 +65,8 @@ function ListItem:draw()
     return
   end
 
-  love.graphics.setColor(255, 0, 0)
-  love.graphics.rectangle("fill", x, y, width, height)
+  -- love.graphics.setColor(255, 0, 0)
+  -- love.graphics.rectangle("fill", x, y, width, height)
 
   Object.draw(self)
 end

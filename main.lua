@@ -25,7 +25,8 @@ function love.load()
   local list = gui:createList()
   list:setPosition(0, 0)
   list:setSize(lui.percent(100), lui.percent(100))
-  list:setPadding(10)
+  -- list:setPadding(10)
+  list:setSpacing(1)
   panel:addChild(list)
 
   for i = 1, 100, 1 do

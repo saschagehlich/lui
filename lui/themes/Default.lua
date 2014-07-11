@@ -76,6 +76,20 @@ function DefaultTheme:drawList(list)
   love.graphics.setColor(255, 255, 255)
 end
 
+--- Draws the given list item
+--  @param {ListItem} listItem
+function DefaultTheme:drawListItem(listItem)
+  local x, y = listItem:getPosition()
+  local width, height = listItem:getSize()
+
+  -- Draw background
+  love.graphics.setColor(listItem.scheme.listItemBackgroundColor)
+  love.graphics.rectangle("fill", x, y, width, height)
+
+  -- Reset color
+  love.graphics.setColor(255, 255, 255)
+end
+
 --- Draws the given window
 --  @param {Window} window
 function DefaultTheme:drawWindow(window)

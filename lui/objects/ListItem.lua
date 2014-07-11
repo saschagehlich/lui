@@ -54,6 +54,8 @@ end
 
 --- Only for debugging. I guess.
 function ListItem:draw()
+  self.theme:drawListItem(self)
+
   local x, y = self:getPosition()
   local width, height = self:getSize()
 
@@ -64,9 +66,6 @@ function ListItem:draw()
   if relativeY > listBottom or relativeY + height < listTop then
     return
   end
-
-  -- love.graphics.setColor(255, 0, 0)
-  -- love.graphics.rectangle("fill", x, y, width, height)
 
   Object.draw(self)
 end

@@ -14,9 +14,10 @@ local Gray = {
 
   -- List
   listBackgroundColor = { 0, 0, 0, 50 },
+  listItemBackgroundColor = { 0, 0, 0, 50 },
 
   -- ScrollBar
-  scrollBarBackgroundColor = { 0, 0, 255 },
+  scrollBarBackgroundColor = { 0, 0, 0, 80 },
 
   -- Button
   buttonBackgroundColor = { 131, 151, 151 },

@@ -46,22 +46,39 @@ function lui:initialize(config)
 
   self.root = self:createRoot()
 
+  print(self.root.createPanel)
+
   EventEmitter._init(self)
 end
 
 --- Builds `lui:create{ObjectName}` methods for all available object types
 --  @private
 function lui:_buildCreators()
+  self:_attachCreators(self)
+end
+
+--- Attaches the create methods to the given object
+--  @param {Object} object
+function lui:_attachCreators(object)
   for _, objectName in ipairs(self.availableObjects) do
     -- Get class
     local class = require(path .. ".objects." .. objectName)
     assert(class, "Object type " .. objectName .. " could not be found.")
 
     -- Creates a new instance of `objectName`
-    self["create" .. objectName] = function(...)
-      local newObject = class(...)
+    object["create" .. objectName] = function(object, ...)
+      local newObject = class(self, ...)
+      self:_attachCreators(newObject)
       self:_onNewObject(newObject)
       self:_addObject(newObject)
+
+      if object.class ~= Root and
+        object ~= self and
+        class.addToCreator then
+          -- Automatically add child
+          object:addChild(newObject)
+      end
+
       return newObject
     end
   end
@@ -200,6 +217,13 @@ end
 --  @public
 function lui:getThemePath(themeName)
   return path .. "/themes/" .. themeName.pathName
+end
+
+--- Shortcut for lui.root:addChild()
+--  @param {Object} object
+--  @public
+function lui:addChild(...)
+  self.root:addChild(...)
 end
 
 return lui

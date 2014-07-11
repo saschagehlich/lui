@@ -7,6 +7,10 @@ local Util = require(pathBase .. ".lib.Util")
 
 local Box = class("Box")
 
+-- When the user calls Object:createObject(), we want
+-- to automatically add it to the children
+Box.static.addToCreator = true
+
 --- `Box` constructor
 --  @param {lui} lui
 function Box:initialize(lui)

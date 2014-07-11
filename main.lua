@@ -13,29 +13,27 @@ function love.load()
   window:setScheme("Red")
   window:setPadding(40, 0, 0, 0)
   window:setLockedToParent(true)
+  gui:addChild(window)
   window:setCenter()
 
-  local panel = gui:createPanel()
+  local panel = window:createPanel()
   panel:setPosition(0, 40)
   panel:setScheme("Gray")
   panel:setSize(lui.percent(100), lui.percent(100))
   panel:setPadding(5, 5)
-  window:addChild(panel)
 
-  local tabs = gui:createTabs()
+  local tabs = panel:createTabs()
   tabs:setTabSize(100, 25)
   tabs:setSize(lui.percent(100), lui.percent(100))
 
   -- Add tabs
-  local tab1 = gui:createTab()
+  local tab1 = tabs:createTab()
   tab1:setContent(tab1Panel)
   tabs:addTab(tab1)
 
-  local tab2 = gui:createTab()
+  local tab2 = tabs:createTab()
   tab2:setContent(tab2Panel)
   tabs:addTab(tab2)
-
-  panel:addChild(tabs)
 end
 
 function love.update(dt)

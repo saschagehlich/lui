@@ -28,9 +28,6 @@ function Window:initialize(lui, title)
   }
 
   self:_createCloseButton()
-
-  -- Window objects are automatically added to root
-  self.lui.root:addChild(self)
 end
 
 --- Since we get the default window padding and the

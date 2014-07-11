@@ -5,12 +5,16 @@ local Button = require((...):match(pathMatch) .. ".objects.Button")
 
 local Tab = class("Tab", Button)
 
+-- When the user calls Tabs:addTab(), we don't want to
+-- add it to the tab's children
+Tab.static.addToCreator = false
+
 --- `Tab` constructor
 --  @param {lui} lui
 function Tab:initialize(lui)
   Button.initialize(self, lui)
 
-  self.index = nil
+  self.index = 0
   self.tabs = nil
 
   self.isToggleable = true
@@ -33,9 +37,11 @@ function Tab:getX(relative)
 
   local tabs = self.tabs
   local x = 0
-  tabs:eachTabBefore(self.index, function (tab)
-    x = x + tab:getWidth() + tabs.spacing
-  end)
+  if tabs then
+    tabs:eachTabBefore(self.index, function (tab)
+      x = x + tab:getWidth() + tabs.spacing
+    end)
+  end
 
   return x + defaultX
 end

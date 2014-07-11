@@ -19,14 +19,14 @@ function Clickable:_handleClick()
     mouseDown and
     not self.isPressed and
     not self.lui.isPressed then
-      self:emit("mousepressed")
+      self:emit("mousepressed", self)
       self.isPressed = true
   else
     if not mouseDown and self.isPressed then
       self:emit("mousereleased")
       self.isPressed = false
       if self.isHovered then
-        self:emit("click")
+        self:emit("click", self)
       end
     end
   end

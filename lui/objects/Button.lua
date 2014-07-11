@@ -111,6 +111,13 @@ function Button:setToggleable(bool)
   self.isToggleable = bool
 end
 
+--- Sets the toggle state
+--  @param {Boolean} bool
+--  @public
+function Button:setToggle(bool)
+  self.isToggled = bool
+end
+
 --- Sets the text
 --  @param {String} text
 --  @public

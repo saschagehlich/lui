@@ -8,7 +8,8 @@ lui.availableObjects = {
   "Object", "Root", "Group",
   "Window", "Panel", "Tooltip",
   "Button", "Text", "Image",
-  "List", "ListItem", "ScrollBar"
+  "List", "ListItem", "ScrollBar",
+  "Tabs", "Tab"
 }
 
 lui.availableSchemes = {

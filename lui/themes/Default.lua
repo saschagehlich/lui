@@ -116,6 +116,22 @@ function DefaultTheme:drawPanel(panel)
   love.graphics.setColor(255, 255, 255)
 end
 
+--- Draws the given tab
+--  @param {Tab} tab
+function DefaultTheme:drawTab(tab)
+  local x, y = tab:getPosition()
+  local width, height = tab:getSize()
+
+  -- Draw background
+  love.graphics.setColor(tab.scheme.tabBackgroundColor)
+  love.graphics.rectangle("fill", x, y, width, height)
+
+  self:drawLighting(false, x, y, width, height)
+
+  -- Reset color
+  love.graphics.setColor(255, 255, 255)
+end
+
 --- Draws the given button
 --  @param {Button} button
 function DefaultTheme:drawButton(button)

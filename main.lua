@@ -22,23 +22,20 @@ function love.load()
   panel:setPadding(5, 5)
   window:addChild(panel)
 
-  local list = gui:createList()
-  list:setPosition(0, 0)
-  list:setSize(lui.percent(100), lui.percent(100))
-  -- list:setPadding(10)
-  list:setSpacing(1)
-  panel:addChild(list)
+  local tabs = gui:createTabs()
+  tabs:setTabSize(100, 25)
+  tabs:setSize(lui.percent(100), lui.percent(100))
 
-  for i = 1, 100, 1 do
-    local item = gui:createListItem()
+  -- Add tabs
+  local tab1 = gui:createTab()
+  tab1:setContent(tab1Panel)
+  tabs:addTab(tab1)
 
-    local text = gui:createText("Ohai " .. i)
-    text:setAlignment("center", "center")
-    text:setSize(lui.percent(100), lui.percent(100))
+  local tab2 = gui:createTab()
+  tab2:setContent(tab2Panel)
+  tabs:addTab(tab2)
 
-    item:addChild(text)
-    list:addItem(item)
-  end
+  panel:addChild(tabs)
 end
 
 function love.update(dt)

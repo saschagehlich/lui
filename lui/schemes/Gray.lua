@@ -19,6 +19,9 @@ local Gray = {
   -- ScrollBar
   scrollBarBackgroundColor = { 0, 0, 0, 80 },
 
+  -- Tabs
+  tabBackgroundColor = { 131, 151, 151 },
+
   -- Button
   buttonBackgroundColor = { 131, 151, 151 },
   buttonToggledBackgroundColor = { 91, 115, 115 },

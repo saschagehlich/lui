@@ -19,6 +19,9 @@ local Red = {
   -- ScrollBar
   scrollBarBackgroundColor = { 0, 0, 0, 80 },
 
+  -- Tabs
+  tabBackgroundColor = { 179, 79, 79 },
+
   -- Button
   buttonBackgroundColor = { 179, 79, 79 },
   buttonToggledBackgroundColor = { 95, 7, 7 },

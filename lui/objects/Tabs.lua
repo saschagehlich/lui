@@ -12,6 +12,7 @@ function Tabs:initialize(lui)
 
   self.tabs = {}
   self.spacing = 5
+  self.currentTab = nil
 
   -- Create tabs group
   self.tabsGroup = self.lui:createGroup()
@@ -35,7 +36,7 @@ function Tabs:setTabSize(width, height)
   self.tabSize.height = height
 
   self.tabsGroup:setSize(self.lui.percent(100), height)
-  self.contentGroup:setMargin(0, self.tabSize.height)
+  self.contentGroup:setMargin(self.tabSize.height, 0, 0, 0)
 
   self:eachTab(function (tab)
     tab:setSize(self.tabSize.width, self.tabSize.height)
@@ -65,10 +66,24 @@ end
 --  @param {Tab} tab
 --  @private
 function Tabs:_onTabClick(tab)
+  -- Untoggle all buttons, toggle the current one
   self:eachTab(function(tab)
     tab:setToggle(false)
   end)
   tab:setToggle(true)
+
+  -- Remove the current content tab
+  if self.currentTab then
+    if self.currentTab == tab then
+      return
+    end
+    self.currentTab.contentObject:remove()
+  end
+
+  -- Add the content to the gui
+  self.contentGroup:addChild(tab.contentObject)
+
+  self.currentTab = tab
 end
 
 --- Calls fn for every existing tab

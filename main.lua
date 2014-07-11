@@ -27,12 +27,17 @@ function love.load()
   tabs:setSize(lui.percent(100), lui.percent(100))
 
   -- Add tabs
-  local tab1 = tabs:createTab()
-  tab1:setContent(tab1Panel)
+  local tab1 = gui:createTab()
+  local tab1Group = gui:createGroup()
+  local tab1Text = tab1Group:createText("Ohai tab 1.")
+
+  tab1:setContent(tab1Group)
   tabs:addTab(tab1)
 
   local tab2 = tabs:createTab()
-  tab2:setContent(tab2Panel)
+  local tab2Group = gui:createGroup()
+  local tab2Text = tab2Group:createText("Ohai tab 2.")
+  tab2:setContent(tab2Group)
   tabs:addTab(tab2)
 end
 

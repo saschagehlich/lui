@@ -62,15 +62,6 @@ end
 --  @public
 function Box:remove()
   self.isRemoved = true
-
-  self:eachChild(function (child)
-    child:remove()
-  end)
-
-  self:eachInternal(function (child)
-    child:remove()
-  end)
-
   self:emit("removed")
   if self.tooltip then
     self.tooltip:remove()
@@ -247,6 +238,10 @@ function Box:getY(relative)
     local top, right, bottom, left = self.parent:getMargin()
     y = y + top
   end
+
+  -- Add top margin
+  local top = self:getMargin()
+  y = y + top
 
   -- If centering is enabled for x or y, set the position to
   -- the center
@@ -577,6 +572,7 @@ end
 --  @public
 function Box:setParent(object)
   self.parent = object
+  self.isRemoved = false
 end
 
 --- Calls fn for each child

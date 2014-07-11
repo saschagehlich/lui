@@ -5,6 +5,8 @@ local Object = require((...):match(pathMatch) .. ".objects.Object")
 
 local Root = class("Root", Object)
 
+Root.static.addToCreator = false
+
 --- `Root` constructor
 --  @param {lui} lui
 function Root:initialize(lui)

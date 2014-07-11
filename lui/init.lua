@@ -39,7 +39,7 @@ function lui:initialize(config)
   self.isDragging = false
   self.isPressed = false
 
-  self:_buildCreators()
+  self:_attachCreators(self)
 
   self.defaultTheme = self:getTheme("Default")
   self.defaultScheme = self:getScheme("Blue")
@@ -49,12 +49,6 @@ function lui:initialize(config)
   print(self.root.createPanel)
 
   EventEmitter._init(self)
-end
-
---- Builds `lui:create{ObjectName}` methods for all available object types
---  @private
-function lui:_buildCreators()
-  self:_attachCreators(self)
 end
 
 --- Attaches the create methods to the given object
@@ -72,8 +66,7 @@ function lui:_attachCreators(object)
       self:_onNewObject(newObject)
       self:_addObject(newObject)
 
-      if object.class ~= Root and
-        object ~= self and
+      if object ~= self and
         class.addToCreator then
           -- Automatically add child
           object:addChild(newObject)

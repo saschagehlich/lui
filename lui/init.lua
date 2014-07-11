@@ -46,8 +46,6 @@ function lui:initialize(config)
 
   self.root = self:createRoot()
 
-  print(self.root.createPanel)
-
   EventEmitter._init(self)
 end
 

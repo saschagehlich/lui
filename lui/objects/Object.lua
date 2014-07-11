@@ -26,8 +26,8 @@ Object:include(Tooltippable)
 function Object:initialize(lui)
   Box.initialize(self, lui)
 
-  self.theme = self.lui.defaultTheme
-  self.scheme = self.lui.defaultScheme
+  self.theme = lui.defaultTheme
+  self.scheme = lui.defaultScheme
 
   EventEmitter._init(self)
   Hoverable._init(self)
@@ -67,7 +67,7 @@ function Object:draw()
 end
 
 --- Sets the theme of this object
---  @param {String}
+--  @param {String} name
 --  @public
 function Object:setTheme(name)
   self.theme = self.lui:getTheme(name)
@@ -82,7 +82,7 @@ function Object:setTheme(name)
 end
 
 --- Sets the color scheme of this object
---  @param {String}
+--  @param {String} name
 --  @public
 function Object:setScheme(name)
   self.scheme = self.lui:getScheme(name)
